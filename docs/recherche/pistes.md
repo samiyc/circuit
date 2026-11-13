@@ -25,9 +25,10 @@ mesure. Une piste qui ne tranche rien n'est pas lancée. Rédigé le 13/11/2026,
 
 - **À écrire** : le format de piste de TU Munich (ligne centrale et largeurs), la ligne comme N écarts, la courbure
   discrète, le profil avant-arrière d'un point matériel (μ·g, une accélération et un freinage maximaux).
-- **Les pistes** : des circuits de F1 et Le Mans (Sami, 13/11). Vérifier que la Sarthe est dans la base TUM, et lire
-  ce que le dépôt `laptime-simulation` de TU Munich donne comme paramètres de voiture ([questions.md](questions.md)
-  § 1, question 5).
+- **Les pistes** : des circuits de F1 et Le Mans (Sami, 13/11). La base TUM a 25 circuits, **sans Le Mans**
+  ([bancs.md](bancs.md) § 1) ; la Sarthe attendra une autre source. La voiture : la F1 de `laptime-simulation`
+  (733 kg, μ des pneus 1,65 à 2,15, appui et traînée), réduite au J1 à un point matériel, avec l'appui qui fait
+  monter l'adhérence avec v² ([questions.md](questions.md) § 1, question 5).
 - **Les trois références** : la ligne centrale, la plus courte, la courbure minimale. Les deux dernières se trouvent
   sans QP au début, par une descente projetée sur leur note (longueur, courbure²). Le QP vient en P4.
 - **Les tests** : sur un cercle, la vitesse est constante et égale à √(μ·g·R) ; sur une ligne droite, le temps
@@ -104,7 +105,10 @@ pas, et ses entrées tremblent.
 Un μ par portion de piste et par météo. **La route mouillée d'abord** (Sami, 13/11 : « comme par exemple une route
 mouillé ») : un μ plus bas partout, puis par endroits (une flaque, une portion à l'ombre). Les surfaces de Trackmania
 (terre, glace) suivent si elles servent. **La question** : la ligne de P2 change-t-elle comme un pilote l'attend ? On
-freine plus tôt, on cherche l'adhérence ailleurs (la ligne de pluie : question au professionnel, [questions.md](questions.md) § 4).
+freine plus tôt, on cherche l'adhérence ailleurs. **Le modèle de la pluie** : un μ plus bas sur une bande autour de
+la trajectoire sèche (le caoutchouc et l'asphalte poli y glissent le plus). L'optimiseur doit alors retrouver seul
+la ligne de pluie des écoles : plus large à l'entrée, droite à la sortie ([questions.md](questions.md) § 4,
+question 3).
 
 **P8 bis, la voiture « à la Trackmania »** : peu de freins, beaucoup de dérapage. Sami : « il ne faut presque jamais
 lever le pied ». Le même optimiseur doit retrouver ce style sur cette physique-là. C'est un bon test : la ligne vient
@@ -114,9 +118,11 @@ de la physique, pas de nos idées.
 
 C'est la partie « raquette ». Sami pilote contre ses fantômes, celui de la ligne idéale, puis le pilote de P7.
 
-- **Les commandes** (Sami, 13/11) : accélérer avec la flèche haut ou A, freiner avec Ctrl gauche ou RB, tourner
-  avec les flèches ou le stick gauche (analogique). Le clavier et la manette, tous deux dès J4. Le délai de la manette
-  se mesure.
+- **Les commandes** (Sami, 13/11) : accélérer avec la flèche haut ou A, freiner avec Ctrl gauche, RB ou **la gâchette
+  RT, analogique, pour le freinage dégressif**, tourner avec les flèches ou le stick gauche (analogique). Le clavier
+  et la manette, tous deux dès J4. Le délai de la manette se mesure, et ce que le clavier perd sans frein dosé aussi.
+- **Un repère de freinage** (un panneau à 100 m) sur la vue de face : c'est ainsi que les pilotes trouvent leur point
+  de freinage ([questions.md](questions.md) § 4, question 1).
 - **Les vues**, comme raquette : de dessus (la piste et les lignes), de profil (la vitesse le long du tour), de face
   (la voiture vue de derrière, pour piloter).
 - Ses entrées passent par une fonction pure, pour que les tests les simulent.

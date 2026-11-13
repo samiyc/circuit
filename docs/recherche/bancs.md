@@ -12,9 +12,15 @@ Recherché le 13/11/2026. Une mesure se fait sur des pistes fixes, et toutes les
   toute faite pour vérifier notre propre courbure minimale.
 - **Deux réserves** (leur README) : les lignes centrales ont été lissées, donc elles ne sont plus exactement au
   milieu de la piste ; les largeurs ont été extraites d'images satellite par traitement d'image, et non relevées.
-- **La licence** : LGPL-3.0 d'après un agrégateur (ecosyste.ms). **À vérifier** sur le fichier LICENSE du dépôt avant
-  d'en copier une piste dans le nôtre. En attendant, **hypothèse** : un script les télécharge dans un dossier ignoré
-  par git, au lieu de les copier.
+- **La licence** : **LGPL-3.0**, lue sur le dépôt le 13/11 au soir (l'API de GitHub). Décidé avec Sami : un script
+  télécharge les pistes dans un dossier ignoré par git, au lieu de les copier.
+- **Les 25 circuits** (le dossier `tracks`, lu le 13/11) : Austin, Brands Hatch, Budapest, Catalunya, Hockenheim,
+  IMS (Indianapolis), Melbourne, Mexico, Montréal, Monza, Moscow Raceway, Norisring, Nürburgring, Oschersleben,
+  Sakhir, São Paulo, Sepang, Shanghai, Silverstone, Sotchi, Spa, Spielberg, Suzuka, Yas Marina, Zandvoort.
+  **Le Mans n'y est pas** ; l'hypothèse pour la Sarthe est le tracé d'OpenStreetMap ([questions.md](questions.md)
+  § 1, question 5).
+- **La voiture qui va avec** : le dépôt voisin `laptime-simulation` (LGPL-3.0) a une F1 paramétrée sur Shanghai.
+  Monza (rapide) et Spa contre Budapest ou Monaco (lent, absent ici) donnent les deux extrêmes pour P11.
 
 **Pour nous** : le banc principal. Il nous donne de vrais circuits à l'échelle, le format qu'on adopte, et une ligne
 de référence.
