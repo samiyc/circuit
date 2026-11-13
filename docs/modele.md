@@ -133,8 +133,48 @@ profil).
 
 ## 6. Les temps au tour des références
 
-La mesure `npm run references` des 25 pistes attend sa place dans la file (job `circuit-references-j1`, 14/11). Le
-tableau viendra ici.
+Mesuré le 14/11 par la file (job `circuit-references-j1`, 59 s de calcul en tout, 0,9 à 4,5 s par piste). Les temps
+sont en secondes, avec la F1 en point matériel. Les trois premières colonnes sont à 1 m du bord ; les trois suivantes
+comparent notre courbure minimale à la ligne de TU Munich, à leur marge de 0,75 m, toutes deux notées par notre profil.
+
+| Piste | Centre | La plus courte | Courbure min. | à 0,75 m : la nôtre | celle de TUM | écart moyen / max (m) |
+|---|---|---|---|---|---|---|
+| Austin | 111,76 | 125,72 | 89,93 | 89,54 | 90,25 | 1,51 / 6,04 |
+| BrandsHatch | 67,85 | 75,10 | 56,94 | 56,39 | 57,66 | 0,46 / 3,99 |
+| Budapest | 88,06 | 101,99 | 74,93 | 74,47 | 74,82 | 1,33 / 8,51 |
+| Catalunya | 87,93 | 96,24 | 74,95 | 74,58 | 75,69 | 1,45 / 8,98 |
+| Hockenheim | 86,89 | 93,39 | 70,86 | 70,51 | 71,12 | 0,45 / 2,68 |
+| IMS | 46,46 | 48,54 | 46,15 | 46,14 | 46,13 | 0,14 / 0,68 |
+| Melbourne | 101,23 | 107,53 | 81,56 | 80,82 | 82,94 | 0,25 / 1,31 |
+| MexicoCity | 91,39 | 95,67 | 74,44 | 74,01 | 74,77 | 1,39 / 5,69 |
+| Montreal | 81,76 | 88,60 | 72,79 | 72,31 | 72,05 | 0,65 / 9,73 |
+| Monza | 91,35 | 95,77 | 81,05 | 80,55 | 81,14 | 0,92 / 5,03 |
+| MoscowRaceway | 95,16 | 102,41 | 74,39 | 74,00 | 75,45 | 0,89 / 12,19 |
+| Norisring | 45,57 | 46,95 | 39,59 | 39,51 | 39,33 | 0,74 / 13,96 |
+| Nuerburgring | 95,73 | 111,60 | 83,18 | 82,84 | 83,34 | 0,79 / 8,01 |
+| Oschersleben | 74,85 | 81,84 | 60,89 | 60,45 | 61,09 | 0,68 / 8,72 |
+| Sakhir | 103,35 | 110,12 | 85,20 | 84,90 | 85,96 | 1,09 / 4,91 |
+| SaoPaulo | 80,08 | 96,21 | 66,61 | 66,38 | 67,30 | 0,51 / 9,64 |
+| Sepang | 106,14 | 117,07 | 86,45 | 86,18 | 87,22 | 0,74 / 11,98 |
+| Shanghai | 103,42 | 118,04 | 89,32 | 89,10 | 89,19 | 2,16 / 12,01 |
+| Silverstone | 104,27 | 123,38 | 84,40 | 84,16 | 85,00 | 0,56 / 11,75 |
+| Sochi | 117,58 | 122,27 | 91,99 | 91,35 | 92,44 | 0,74 / 8,93 |
+| Spa | 114,50 | 127,79 | 102,01 | 101,63 | 102,42 | 0,43 / 7,08 |
+| Spielberg | 71,99 | 80,43 | 64,91 | 64,62 | 65,13 | 0,17 / 1,14 |
+| Suzuka | 97,76 | 110,50 | 85,53 | 85,14 | 85,49 | 0,53 / 8,96 |
+| YasMarina | 120,65 | 128,11 | 97,20 | 96,58 | 96,28 | 0,58 / 10,16 |
+| Zandvoort | 80,04 | 93,19 | 70,63 | 70,39 | 70,88 | 0,97 / 10,10 |
+
+- **L'ordre est le même partout** : la courbure minimale bat le centre de 6 à 26 s (IMS, un ovale, à part : 0,3 s),
+  et la plus courte est toujours la plus lente, de 3 à 20 % derrière le centre : elle serre trop les virages.
+- **Contre TU Munich**, notre courbure minimale est plus rapide sur 21 pistes sur 25, de 0,1 à 2,1 s. Elle est plus lente
+  sur Yas Marina (+0,30 s), Montréal (+0,26 s), le Norisring (+0,18 s) et IMS (+0,01 s). Les deux lignes passent en
+  moyenne à 0,1 à 2,2 m l'une de l'autre. L'écart maximal monte à 14 m (Norisring) ; où il se
+  produit n'a pas été regardé.
+- **Ce que ça ne dit pas** : leur ligne minimise leur courbure, sur leur spline, et elle n'est pas faite pour notre
+  profil. Être plus rapide qu'elle sous notre note montre que notre courbure minimale est une règle à battre sérieuse,
+  pas qu'elle est meilleure dans l'absolu.
+- **La règle à battre au J2** est donc la courbure minimale, de 39,5 s (Norisring) à 102 s (Spa).
 
 ## 7. Le banc de la note
 
