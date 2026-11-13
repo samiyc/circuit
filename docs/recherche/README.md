@@ -29,7 +29,7 @@ Le problème se coupe en trois couches, et la littérature les traite à part :
 | [trackmania.md](trackmania.md) | ce que Trackmania apprend : sa physique à 100 Hz, le *bruteforce* des TAS (une escalade !), les IA Linesight et tmrl, la preuve de NP-complétude |
 | [bancs.md](bancs.md) | les pistes publiques (la base de TU Munich, F1TENTH, TORCS) et nos pistes tirées par graine |
 | [pistes.md](pistes.md) | les expériences à mener, classées, avec ce que chacune doit trancher |
-| [questions.md](questions.md) | les questions pour Sami, le joueur de Trackmania, avec une hypothèse en attendant |
+| [questions.md](questions.md) | les réponses de Sami (le joueur, 13/11) et les questions pour un professionnel (pilote, mécanicien) |
 
 ## Ce qu'on a déjà, ce qui est neuf
 
@@ -50,6 +50,8 @@ Le détail est dans [pistes.md](pistes.md). En bref :
    référence (le centre, la plus courte, la courbure minimale) et leurs temps au tour.
 2. **J2, la première vraie question** : CMA-ES sur les écarts, noté par le temps au tour, contre l'escalade et contre
    la courbure minimale. La ligne doit prendre les virages extérieur-corde-extérieur sans qu'on le lui dise.
-3. **J3, la page** : la piste, la ligne colorée par la vitesse, le fantôme qui tourne.
-4. **J4, le pilote** : une voiture qui glisse, un pilote qui suit la ligne, puis Sami au clavier contre le fantôme.
-5. **Plus tard** : les surfaces à la Trackmania (glace, terre), plusieurs voitures, l'auto-jeu.
+3. **J3, la page**, comme raquette : la piste vue de dessus, la ligne colorée par la vitesse, le profil de
+   vitesse, le fantôme qui tourne.
+4. **J4, le pilote** : une voiture qui glisse, un pilote qui suit la ligne, puis Sami au clavier et à la manette
+   contre les fantômes (sans collision).
+5. **Plus tard** : la pluie et les surfaces, la voiture « à la Trackmania », l'auto-jeu.

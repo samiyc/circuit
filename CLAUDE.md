@@ -24,6 +24,12 @@ time) is the family no project has yet; `reseau` will need the same (the DC-OPF)
 copy what serves, never import them, never edit that repository. All the research of the framing, with its sources, is
 in `docs/recherche/`: read it before deciding anything.
 
+**Decided with Sami on 13/11** (his answers, quoted, in `docs/recherche/questions.md`): real cars on F1 and Le Mans
+tracks, Trackmania's drift only as a later variant; wet roads first among the grip changes; no collisions, the other
+cars are ghosts; keyboard and gamepad (accelerate Up / A, brake left Ctrl / RB, steer arrows / left stick); views
+from above, side and front as in raquette; the QP solver goes in the library; TUM's tracks are downloaded by a
+script into a folder git ignores; no hooking into Trackmania itself.
+
 Its line in the roadmap: `mcts-commun/docs/feuille-de-route.md`, § 2.C. Start there, with `mcts-commun`'s `CLAUDE.md`,
 `docs/algorithmes.md`, `docs/backlog.md` and `docs/board.md`.
 

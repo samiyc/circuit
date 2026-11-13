@@ -15,9 +15,9 @@ mesure. Une piste qui ne tranche rien n'est pas lancée. Rédigé le 13/11/2026,
 | P5 | L'optimisation bayésienne | plus tard | paie-t-elle quand la note coûte cher ? | à écrire |
 | P6 | Les entrées pas à pas contre la ligne puis le suivi | J4 | la leçon du *bruteforce* de Trackmania | `climb`, `beam` |
 | P7 | Le pilote : poursuite pure, faisceau, escalade | J4 | qui tient la ligne avec une voiture qui glisse | `beam`, `climb` |
-| P8 | Les surfaces (glace, terre) | J5 | la ligne s'adapte-t-elle à l'adhérence ? | `cmaes` |
-| P9 | Sami aux commandes, contre le fantôme | J4-J5 | le jeu, et le test humain du pilote | – |
-| P10 | Plusieurs voitures, le dépassement | plus tard | la ligne défensive, la ligne d'attaque | `search` ? |
+| P8 | La pluie et les surfaces | J5 | la ligne s'adapte-t-elle à l'adhérence ? | `cmaes` |
+| P9 | Sami aux commandes (clavier et manette), contre les fantômes | J4-J5 | le jeu, et le test humain du pilote | – |
+| P10 | Plusieurs voitures, en fantômes (sans collision) | plus tard | une course à plusieurs, sans contact | – |
 | P11 | La ligne et le réglage ensemble | plus tard | le résultat de Perantoni et Limebeer, sans gradients | `cmaes` |
 | P12 | L'auto-jeu, une valeur apprise | bien plus tard | ce que fait Linesight, à notre échelle | – |
 
@@ -25,6 +25,9 @@ mesure. Une piste qui ne tranche rien n'est pas lancée. Rédigé le 13/11/2026,
 
 - **À écrire** : le format de piste de TU Munich (ligne centrale et largeurs), la ligne comme N écarts, la courbure
   discrète, le profil avant-arrière d'un point matériel (μ·g, une accélération et un freinage maximaux).
+- **Les pistes** : des circuits de F1 et Le Mans (Sami, 13/11). Vérifier que la Sarthe est dans la base TUM, et lire
+  ce que le dépôt `laptime-simulation` de TU Munich donne comme paramètres de voiture ([questions.md](questions.md)
+  § 1, question 5).
 - **Les trois références** : la ligne centrale, la plus courte, la courbure minimale. Les deux dernières se trouvent
   sans QP au début, par une descente projetée sur leur note (longueur, courbure²). Le QP vient en P4.
 - **Les tests** : sur un cercle, la vitesse est constante et égale à √(μ·g·R) ; sur une ligne droite, le temps
@@ -32,6 +35,8 @@ mesure. Une piste qui ne tranche rien n'est pas lancée. Rédigé le 13/11/2026,
 - **Le banc** : le temps de la note en microsecondes, par tour et par point. C'est lui qui fixe le budget de P2.
 - **La vérification** : notre courbure minimale doit ressembler à la ligne de course de la base TUM sur un de ses
   circuits (même forme, un écart à mesurer).
+- **Le cas « pied au plancher »** : un virage assez ouvert se passe à fond (Sami, 13/11). Un test le vérifie : là où
+  la vitesse limite du virage dépasse la vitesse atteinte, le profil ne freine pas.
 
 ## P2. CMA-ES sur les écarts, noté par le temps (J2)
 
@@ -64,8 +69,9 @@ C'est la première vraie question du projet.
 
 - **Le dispositif** : le profil de vitesse, puis un pas convexe sur la ligne qui réduit la courbure pondérée par la
   vitesse, sous les bornes de la piste, et on recommence (Kapania et al., 2015).
-- **Ce qu'il faut** : un petit solveur QP à bornes. **Proposition** : l'écrire dans la lib (`mcts-commun`), car
-  `reseau` en a besoin pour le DC-OPF. À décider avec Sami ([questions.md](questions.md)).
+- **Ce qu'il faut** : un petit solveur QP à bornes. **Décidé par Sami le 13/11** : il s'écrit dans la lib
+  (`mcts-commun`), car `reseau` en a besoin pour le DC-OPF. C'est la session `commun` qui l'écrit, à la demande du
+  premier des deux projets qui en a besoin.
 - **La question** : à temps de calcul égal, le pas convexe bat-il CMA-ES ? Et CMA-ES, parti de la ligne des deux
   étapes, gagne-t-il encore ?
 
@@ -93,21 +99,36 @@ pas, et ses entrées tremblent.
 - **La mesure** : le temps au tour et l'écart à la ligne, sur les mêmes pistes, avec des perturbations tirées par
   graine (un coup de vent, une plaque glissante).
 
-## P8. Les surfaces (J5)
+## P8. La pluie et les surfaces (J5)
 
-Un μ par portion de piste (asphalte, terre, glace), à la Trackmania. **La question** : la ligne de P2 change-t-elle
-comme un pilote l'attend ? On coupe moins sur la glace, on freine plus tôt avant une plaque. Sami juge.
+Un μ par portion de piste et par météo. **La route mouillée d'abord** (Sami, 13/11 : « comme par exemple une route
+mouillé ») : un μ plus bas partout, puis par endroits (une flaque, une portion à l'ombre). Les surfaces de Trackmania
+(terre, glace) suivent si elles servent. **La question** : la ligne de P2 change-t-elle comme un pilote l'attend ? On
+freine plus tôt, on cherche l'adhérence ailleurs (la ligne de pluie : question au professionnel, [questions.md](questions.md) § 4).
+
+**P8 bis, la voiture « à la Trackmania »** : peu de freins, beaucoup de dérapage. Sami : « il ne faut presque jamais
+lever le pied ». Le même optimiseur doit retrouver ce style sur cette physique-là. C'est un bon test : la ligne vient
+de la physique, pas de nos idées.
 
 ## P9. Sami aux commandes (J4-J5)
 
-C'est la partie « raquette ». Sami pilote au clavier (ou à la manette) contre le fantôme de la ligne idéale, puis contre
-le pilote de P7. Ses entrées passent par une fonction pure, pour que les tests les simulent. **Ce que ça apporte** :
-le jeu lui-même, et un test humain du pilote (où gagne-t-il du temps sur la machine ?).
+C'est la partie « raquette ». Sami pilote contre ses fantômes, celui de la ligne idéale, puis le pilote de P7.
+
+- **Les commandes** (Sami, 13/11) : accélérer avec la flèche haut ou A, freiner avec Ctrl gauche ou RB, tourner
+  avec les flèches ou le stick gauche (analogique). Le clavier et la manette, tous deux dès J4. Le délai de la manette
+  se mesure.
+- **Les vues**, comme raquette : de dessus (la piste et les lignes), de profil (la vitesse le long du tour), de face
+  (la voiture vue de derrière, pour piloter).
+- Ses entrées passent par une fonction pure, pour que les tests les simulent.
+
+**Ce que ça apporte** : le jeu lui-même, et un test humain du pilote (où gagne-t-il du temps sur la machine ?).
 
 ## P10. Plusieurs voitures (plus tard)
 
-Le dépassement, la ligne défensive. Liniger le fait en changeant les contraintes selon la situation. Coders Strike
-Back le fait en prédisant l'adversaire d'abord. Ce serait la première place d'une recherche à deux joueurs (`search`).
+**Décidé le 13/11 : pas de collision**, comme dans Trackmania (Sami : « surement plus simple. la collission serait
+complex a gérer »). Les autres voitures sont des fantômes : sa course précédente, la ligne idéale, le pilote robot.
+Le dépassement et la ligne défensive (Liniger, Coders Strike Back) restent hors du projet tant que les voitures se
+traversent.
 
 ## P11. La ligne et le réglage ensemble (plus tard)
 
