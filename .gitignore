@@ -37,3 +37,5 @@ tmp/
 replays/
 # The traces of mcts-commun (MCTS_TRACE=1) and the page server's failed requests.
 logs/
+# TU Munich's racetrack-database (LGPL-3.0), downloaded by `npm run tracks`, never committed (Sami, 13/11/2026).
+data/

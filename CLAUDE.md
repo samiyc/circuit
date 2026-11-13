@@ -56,18 +56,22 @@ Its line in the roadmap: `mcts-commun/docs/feuille-de-route.md`, § 2.C. Start t
   outgrows it is split along its seams, the limit is never raised.
 - **Types come from JSDoc** (`npm run types`); the shapes the modules hand each other are in `src/types.js`.
 - **Commit straight to `main`; push only when Sami asks.** The GitHub repository is his to create, private.
+- **The fingerprints** (`tests/fingerprint.test.js`): a hash of what the model does (the profile, the reference
+  lines). A refactor changes none; a change meant to alter the model updates its hash and says so in the commit, with
+  `npm run references` before and after.
+- **The tracks are TUM's, downloaded** (`npm run tracks`, into `data/tum/`, git-ignored, the commit pinned in
+  `scripts/lib/tracks.js`); a test that needs them skips without them. The model and its measures: `docs/modele.md`.
+- **The bench** (`npm run bench`, `scripts/profile-bench.js`): the cost of a lap time; its hot path does not
+  allocate (no `Math.hypot` there: twice the cost of a square root).
 
 ## To add when their turn comes
 
 Each of these exists in the other clients; copy it from them when there is something for it to hold, not before.
 
-- **The fingerprints** (`tests/fingerprint.test.js`), with the first model: a hash of what the model does. A refactor
-  changes none; a change meant to alter the model updates its hash and says so in the commit, with the measures before
-  and after.
 - **The page**: `npm run page`, `node node_modules/mcts-commun/bin/serve.js 4809` (4800 to 4808 are the projects'),
   with `mcts-commun/web/theme.css` first. Sami prefers sepia, the Khaki of Notepad++, to white.
 - **The changelog** as data (`docs/changelog.json`, `npm run changelog`), with the first version shown on the page.
-- **The bench** (`npm run bench`, `scripts/search-bench.js`), with the first search; its hot paths do not allocate.
+- **The search bench** (`scripts/search-bench.js`), with the first search (J2).
 
 ## The machine
 

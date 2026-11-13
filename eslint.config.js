@@ -27,7 +27,7 @@ const COMMON_RULES = {
 const MODULE = { ecmaVersion: 2022, sourceType: "module" };
 
 export default [
-  { ignores: ["node_modules/**", "coverage/**", "tmp/**", "replays/**", "logs/**", ".idea/**", ".claude/**"] },
+  { ignores: ["node_modules/**", "coverage/**", "data/**", "tmp/**", "replays/**", "logs/**", ".idea/**", ".claude/**"] },
 
   js.configs.recommended,
   sonarjs.configs.recommended,

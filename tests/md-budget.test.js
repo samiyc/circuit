@@ -12,7 +12,7 @@ import { fileURLToPath } from "node:url";
 const ROOT = fileURLToPath(new URL("../", import.meta.url));
 const MD_LINE_LIMIT = 800;
 const CLAUDE_LINE_LIMIT = 300;
-const SKIPPED = new Set(["node_modules", ".git", ".claude", "tmp", "replays", "logs", "coverage"]);
+const SKIPPED = new Set(["node_modules", ".git", ".claude", "tmp", "replays", "logs", "coverage", "data"]);
 
 const markdownUnder = (dir) =>
   readdirSync(dir, { withFileTypes: true }).flatMap((entry) => {

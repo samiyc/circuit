@@ -8,15 +8,19 @@ ligne ; puis un pilote qui la suit tour par tour, à la souris ou au clavier pou
 Client de [`mcts-commun`](../mcts-commun/README.md). La recherche sera choisie par la mesure, contre la ligne la plus
 courte, la ligne à courbure minimale et un pilote qui les suit (poursuite pure).
 
-**État** : le dépôt existe, sans modèle. La recherche du cadrage est faite
-([`docs/recherche/`](docs/recherche/README.md)) ; le premier jalon (J1) est dans
-[`docs/recherche/pistes.md`](docs/recherche/pistes.md).
+**État** (14/11) : le J1 est fait. Il y a la piste au format de TU Munich, la F1 de leur `laptime-simulation` en
+point matériel, le profil de vitesse (la note d'une ligne), les trois lignes de référence, leurs tests et le banc de
+la note. Le modèle et ses mesures sont dans [`docs/modele.md`](docs/modele.md). La recherche du cadrage est dans
+[`docs/recherche/`](docs/recherche/README.md), les jalons suivants dans [`docs/recherche/pistes.md`](docs/recherche/pistes.md).
 
 ## Les commandes
 
 | Commande | Ce qu'elle fait |
 |---|---|
 | `npm install` | installe les outils, relie `mcts-commun` et active le hook de commit |
+| `npm run tracks` | télécharge les 25 pistes de TU Munich dans `data/tum/` (ignoré par git) ; à lancer une fois |
+| `npm run references [Piste…]` | les trois lignes de référence et leurs temps au tour, contre la ligne de TU Munich (long : par la file) |
+| `npm run bench` | le coût d'un temps au tour, par tour et par point, et ce qu'il alloue |
 | `npm run check` | le lint, les types, puis les tests ; c'est ce que lance le hook |
 | `npm run lint` (`lint:fix`) | eslint, avec le budget de complexité de lopin |
 | `npm run types` | tsc vérifie le JavaScript d'après ses commentaires JSDoc, sans rien compiler |
