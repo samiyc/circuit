@@ -63,6 +63,9 @@ Its line in the roadmap: `mcts-commun/docs/feuille-de-route.md`, § 2.C. Start t
   `scripts/lib/tracks.js`); a test that needs them skips without them. The model and its measures: `docs/modele.md`.
 - **The bench** (`npm run bench`, `scripts/profile-bench.js`): the cost of a lap time; its hot path does not
   allocate (no `Math.hypot` there: twice the cost of a square root).
+- **The search bench** (`npm run search-bench`, `scripts/search-bench.js`): the search of reference (from coarse to
+  fine, 40 m then 20 m, `docs/ligne-cmaes.md` § 6) on Monza, Budapest and Silverstone, seed 1, 100 000 lines: 1,62 /
+  2,51 / 2,84 s gained, about 10 s a track. A change to the search says what it does to these figures.
 
 ## To add when their turn comes
 
@@ -71,7 +74,6 @@ Each of these exists in the other clients; copy it from them when there is somet
 - **The page**: `npm run page`, `node node_modules/mcts-commun/bin/serve.js 4809` (4800 to 4808 are the projects'),
   with `mcts-commun/web/theme.css` first. Sami prefers sepia, the Khaki of Notepad++, to white.
 - **The changelog** as data (`docs/changelog.json`, `npm run changelog`), with the first version shown on the page.
-- **The search bench** (`scripts/search-bench.js`), with the first search (J2).
 
 ## The machine
 
