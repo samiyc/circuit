@@ -1,0 +1,37 @@
+/*
+ * The page's Khaki, from Notepad++'s own theme (themes/khaki.xml: 5F5F00 on D7D7AF), as Sami prefers, the same block
+ * as raquette's. Light in both modes: this block comes after the theme, so that it wins over the theme's dark mode too.
+ */
+:root {
+  color-scheme: light;
+  --bg: #d7d7af;
+  --panel: #e8e8cd;
+  --ink: #2f2f00;
+  --ink-2: #4d4d00;
+  --line: #a9a97e;
+  --accent: #5f5f00;
+  --accent-2: #474700;
+  --accent-ink: #ffffff;
+  --masthead: #5f5f00;
+  --masthead-ink: #ffffff;
+}
+
+/* The top view beside the profile on a wide screen, under it on a narrow one. */
+.views { display: grid; grid-template-columns: minmax(0, 1fr); gap: 12px; }
+.views canvas { display: block; width: 100%; background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius); }
+#top { aspect-ratio: 4 / 3; max-height: calc(100vh - 260px); }
+#profile { aspect-ratio: 3 / 1; cursor: crosshair; }
+@media (min-width: 1000px) {
+  .views { grid-template-columns: 3fr 2fr; align-items: start; }
+  #profile { aspect-ratio: 4 / 3; }
+}
+
+.player { align-items: center; }
+.player input[type="range"] { flex: 1; min-width: 200px; padding: 0; }
+#rate-label { min-width: 3em; text-align: center; font-variant-numeric: tabular-nums; }
+.summary { font-variant-numeric: tabular-nums; }
+.legend { margin: 0; font-size: 0.86rem; color: var(--ink-2); }
+.legend .ramp { display: inline-block; width: 120px; height: 10px; vertical-align: middle; border-radius: 3px; margin: 0 6px; }
+#corners tbody tr { cursor: pointer; }
+#corners td.gain { font-weight: 600; }
+#corners td.loss { color: #8e1b1b; }

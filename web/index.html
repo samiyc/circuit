@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Circuit</title>
+    <link rel="stylesheet" href="../node_modules/mcts-commun/web/theme.css" />
+    <link rel="stylesheet" href="style.css" />
+    <script type="importmap">
+      { "imports": { "mcts-commun/": "../node_modules/mcts-commun/src/" } }
+    </script>
+  </head>
+  <body>
+    <header class="masthead">
+      <p class="links"><a href="changelog.html" id="version">Journal des versions</a></p>
+      <h1>Circuit</h1>
+      <p>La ligne idéale d'une F1 sur les 25 circuits de TU Munich : où elle passe, à quelle vitesse, et ce qu'elle gagne sur une autre ligne, virage par virage. Deux fantômes font le tour ensemble.</p>
+    </header>
+    <main>
+      <section class="controls">
+        <label>Circuit<select id="track"></select></label>
+        <label>Ligne A, en couleur<select id="line-a"></select></label>
+        <label>Ligne B, en trait fin<select id="line-b"></select></label>
+        <button type="button" class="quiet" id="whole" hidden>Tout le circuit</button>
+        <button type="button" id="search" hidden>Chercher la meilleure ligne</button>
+      </section>
+      <p class="summary" id="status" aria-live="polite">Chargement…</p>
+      <section class="controls player">
+        <button type="button" id="play">Lecture</button>
+        <input type="range" id="position" min="0" max="1" step="0.0001" value="0" aria-label="Le moment du tour" />
+        <button type="button" class="quiet" id="slower" title="Plus lent">−</button>
+        <span id="rate-label">× 1</span>
+        <button type="button" class="quiet" id="faster" title="Plus vite">+</button>
+      </section>
+      <div class="views">
+        <canvas id="top" aria-label="Le circuit vu de dessus, les deux lignes et leurs fantômes"></canvas>
+        <canvas id="profile" aria-label="La vitesse des deux lignes le long du tour, et l'écart de temps"></canvas>
+      </div>
+      <p class="summary" id="frame"></p>
+      <p class="legend" id="legend"></p>
+      <details open>
+        <summary>Les virages</summary>
+        <p class="hint">Cliquer une ligne pour zoomer sur le virage. La corde est le point où la ligne passe au plus près du bord intérieur. Décalage positif : A prend la corde plus tard que B. Le temps gagné va du début du virage au début du suivant : positif, A y gagne sur B.</p>
+        <div class="scroll"><table id="corners"></table></div>
+      </details>
+      <p class="hint">
+        <strong>Comment lire.</strong> Vue de dessus, la ligne A est colorée par sa vitesse : rouge au plus lent du tour, puis orange, vert, et bleu au plus rapide. La ligne B est le trait sombre. Les ronds pleins marquent les cordes de A, les ronds creux celles de B. Le trait blanc en travers est la ligne de départ.
+        En dessous, la vitesse le long du tour (A en couleur, B en sombre), puis l'écart de temps : au-dessus de zéro, B est en retard sur A à cet endroit. Un clic sur la courbe y place les fantômes.
+        La voiture est la F1 de TU Munich réduite à un point matériel (docs/modele.md) ; les lignes viennent de <code>npm run lines</code>, ou sont calculées ici.
+      </p>
+    </main>
+    <script type="module" src="app.js"></script>
+  </body>
+</html>

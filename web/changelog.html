@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Journal des versions</title>
+    <link rel="stylesheet" href="../node_modules/mcts-commun/web/theme.css" />
+    <link rel="stylesheet" href="style.css" />
+    <link rel="stylesheet" href="changelog.css" />
+  </head>
+  <body>
+    <header class="masthead">
+      <p class="links"><a href="index.html">← le circuit</a></p>
+      <h1>Circuit : journal des versions</h1>
+      <p>Une F1 sur les circuits de TU Munich, en simulation : la ligne idéale calculée hors ligne, puis un pilote qui la suit, puis Sami aux commandes, contre lui.</p>
+    </header>
+    <main class="changelog">
+      <section>
+        <h2>Les versions</h2>
+
+      <article class="version">
+        <h3><span class="tag">0.3.0</span> La page : le circuit vu de dessus, deux fantômes <span class="date">14/11/2026</span></h3>
+        <ul>
+          <li>Une page (npm run page, port 4809) : un des 25 circuits vu de dessus, deux lignes au choix, A colorée par sa vitesse, B en trait sombre, et leurs deux fantômes qui font le tour ensemble.</li>
+          <li>Le profil de vitesse des deux lignes le long du tour, et l'écart de temps point par point ; un clic sur la courbe y place les fantômes.</li>
+          <li>Le tableau des virages : où chaque ligne prend la corde, la vitesse de sortie, la ligne droite qui suit, le temps gagné jusqu'au virage suivant. Un clic zoome sur le virage : à Monza, la Parabolica prise 190 m plus tard que la courbure minimale.</li>
+          <li>Les lignes viennent de npm run lines (data/lines/, hors de git), ou sont calculées dans la page.</li>
+        </ul>
+        <p class="commits"></p>
+      </article>
+
+      <article class="version">
+        <h3><span class="tag">0.2.0</span> La recherche de la ligne <span class="date">14/11/2026</span></h3>
+        <ul>
+          <li>La ligne en gènes, une spline autour de la courbure minimale, cherchée par l'escalade et par CMA-ES, notée par le temps au tour.</li>
+          <li>L'escalade bat CMA-ES ; CMA-ES par fenêtres de 12 gènes ne fait que l'égaler.</li>
+          <li>Du grossier au fin (des gènes tous les 40 m, puis 20 m, puis 10 m), finie par une descente du temps au tour : 2,15 s de mieux que la courbure minimale en moyenne sur les 25 circuits.</li>
+          <li>Devant les longues lignes droites, la ligne trouvée prend la corde plus tard, comme le disent les pilotes.</li>
+        </ul>
+        <p class="commits"></p>
+      </article>
+
+      <article class="version">
+        <h3><span class="tag">0.1.0</span> Le socle : la piste, la voiture, trois lignes <span class="date">13/11/2026</span></h3>
+        <ul>
+          <li>Les 25 circuits de TU Munich, téléchargés hors de git (npm run tracks).</li>
+          <li>La F1 de leur laptime-simulation réduite à un point matériel, avec l'appui aérodynamique, et le profil de vitesse d'une ligne : son temps au tour en 85 µs environ.</li>
+          <li>Trois lignes de référence : la ligne centrale, la plus courte et la courbure minimale, cette dernière plus rapide que la ligne de TU Munich sur 21 circuits sur 25.</li>
+        </ul>
+        <p class="commits"></p>
+      </article>
+      </section>
+      <p class="hint">Le détail, les chiffres et leurs sources sont dans <code>docs/modele.md</code> et <code>docs/ligne-cmaes.md</code>.</p>
+    </main>
+  </body>
+</html>

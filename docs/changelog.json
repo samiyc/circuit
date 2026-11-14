@@ -1,0 +1,42 @@
+{
+  "name": "Circuit",
+  "back": "le circuit",
+  "intro": "Une F1 sur les circuits de TU Munich, en simulation : la ligne idéale calculée hors ligne, puis un pilote qui la suit, puis Sami aux commandes, contre lui.",
+  "versions": [
+    {
+      "version": "0.3.0",
+      "title": "La page : le circuit vu de dessus, deux fantômes",
+      "date": "14/11/2026",
+      "commits": [],
+      "items": [
+        "Une page (npm run page, port 4809) : un des 25 circuits vu de dessus, deux lignes au choix, A colorée par sa vitesse, B en trait sombre, et leurs deux fantômes qui font le tour ensemble.",
+        "Le profil de vitesse des deux lignes le long du tour, et l'écart de temps point par point ; un clic sur la courbe y place les fantômes.",
+        "Le tableau des virages : où chaque ligne prend la corde, la vitesse de sortie, la ligne droite qui suit, le temps gagné jusqu'au virage suivant. Un clic zoome sur le virage : à Monza, la Parabolica prise 190 m plus tard que la courbure minimale.",
+        "Les lignes viennent de npm run lines (data/lines/, hors de git), ou sont calculées dans la page."
+      ]
+    },
+    {
+      "version": "0.2.0",
+      "title": "La recherche de la ligne",
+      "date": "14/11/2026",
+      "commits": [],
+      "items": [
+        "La ligne en gènes, une spline autour de la courbure minimale, cherchée par l'escalade et par CMA-ES, notée par le temps au tour.",
+        "L'escalade bat CMA-ES ; CMA-ES par fenêtres de 12 gènes ne fait que l'égaler.",
+        "Du grossier au fin (des gènes tous les 40 m, puis 20 m, puis 10 m), finie par une descente du temps au tour : 2,15 s de mieux que la courbure minimale en moyenne sur les 25 circuits.",
+        "Devant les longues lignes droites, la ligne trouvée prend la corde plus tard, comme le disent les pilotes."
+      ]
+    },
+    {
+      "version": "0.1.0",
+      "title": "Le socle : la piste, la voiture, trois lignes",
+      "date": "13/11/2026",
+      "commits": [],
+      "items": [
+        "Les 25 circuits de TU Munich, téléchargés hors de git (npm run tracks).",
+        "La F1 de leur laptime-simulation réduite à un point matériel, avec l'appui aérodynamique, et le profil de vitesse d'une ligne : son temps au tour en 85 µs environ.",
+        "Trois lignes de référence : la ligne centrale, la plus courte et la courbure minimale, cette dernière plus rapide que la ligne de TU Munich sur 21 circuits sur 25."
+      ]
+    }
+  ]
+}

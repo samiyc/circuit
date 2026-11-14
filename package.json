@@ -18,7 +18,10 @@
     "types": "tsc -p .",
     "check": "npm run lint && npm run types && npm test",
     "prepare": "git config core.hooksPath .githooks",
-    "search-bench": "node scripts/search-bench.js"
+    "search-bench": "node scripts/search-bench.js",
+    "lines": "node scripts/lines.js",
+    "page": "node node_modules/mcts-commun/bin/serve.js 4809",
+    "changelog": "node scripts/changelog.js"
   },
   "author": "Sami",
   "license": "UNLICENSED",

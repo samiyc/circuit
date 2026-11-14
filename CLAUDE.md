@@ -67,13 +67,15 @@ Its line in the roadmap: `mcts-commun/docs/feuille-de-route.md`, § 2.C. Start t
   fine, 40 m, 20 m then 10 m, `docs/ligne-cmaes.md` § 7) on Monza, Budapest and Silverstone, seed 1, 100 000 lines:
   2.04 / 2.74 / 2.94 s gained, about 10 s a track. A change to the search says what it does to these figures.
 
-## To add when their turn comes
+## The page
 
-Each of these exists in the other clients; copy it from them when there is something for it to hold, not before.
-
-- **The page**: `npm run page`, `node node_modules/mcts-commun/bin/serve.js 4809` (4800 to 4808 are the projects'),
-  with `mcts-commun/web/theme.css` first. Sami prefers sepia, the Khaki of Notepad++, to white.
-- **The changelog** as data (`docs/changelog.json`, `npm run changelog`), with the first version shown on the page.
+- **The page** (J3): `npm run page`, `node node_modules/mcts-commun/bin/serve.js 4809` (4800 to 4808 are the
+  projects'), then http://127.0.0.1:4809/web/. `mcts-commun/web/theme.css` first, then `web/style.css`: the Khaki of
+  Notepad++, as Sami prefers. It only loads, wires and draws; what it shows is computed by `src/` (`src/view/`:
+  the lap clock, the colours, the frame, tested). Its lines come from `npm run lines` (`data/lines/`, git-ignored,
+  through the queue), or are computed in a worker (`web/lines-worker.js`) when they are missing.
+- **The changelog** as data (`docs/changelog.json`, `npm run changelog` writes `web/changelog.html`, a test checks
+  they agree), its last version shown on the page. A version that changes what the page shows adds an entry.
 
 ## The machine
 

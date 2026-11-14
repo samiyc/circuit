@@ -13,34 +13,7 @@ export const TUM_COMMIT = "e59595d1f3573b30d1ded6a08984935b957688e0";
 
 export const TUM_DIR = fileURLToPath(new URL("../../data/tum/", import.meta.url));
 
-/** The 25 tracks of the database, by file name (the folder `tracks`, read on 13/11/2026). */
-export const TRACK_NAMES = Object.freeze([
-  "Austin",
-  "BrandsHatch",
-  "Budapest",
-  "Catalunya",
-  "Hockenheim",
-  "IMS",
-  "Melbourne",
-  "MexicoCity",
-  "Montreal",
-  "Monza",
-  "MoscowRaceway",
-  "Norisring",
-  "Nuerburgring",
-  "Oschersleben",
-  "Sakhir",
-  "SaoPaulo",
-  "Sepang",
-  "Shanghai",
-  "Silverstone",
-  "Sochi",
-  "Spa",
-  "Spielberg",
-  "Suzuka",
-  "YasMarina",
-  "Zandvoort",
-]);
+export { TRACK_NAMES } from "../../src/track/names.js";
 
 /** Whether `npm run tracks` has run. */
 export const tracksDownloaded = () => existsSync(join(TUM_DIR, "tracks", "Monza.csv"));
