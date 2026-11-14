@@ -10,8 +10,9 @@ courte, la ligne à courbure minimale et un pilote qui les suit (poursuite pure)
 
 **État** (14/11) : le J1 est fait. Il y a la piste au format de TU Munich, la F1 de leur `laptime-simulation` en
 point matériel, le profil de vitesse (la note d'une ligne), les trois lignes de référence, leurs tests et le banc de
-la note. Le modèle et ses mesures sont dans [`docs/modele.md`](docs/modele.md). Le J2 (14/11) cherche la ligne : l'escalade bat la courbure minimale de 1,27 s en moyenne
-sur les 25 pistes, et CMA-ES ([`docs/ligne-cmaes.md`](docs/ligne-cmaes.md)). La recherche du cadrage est dans
+la note. Le modèle et ses mesures sont dans [`docs/modele.md`](docs/modele.md). Le J2 (14/11) cherche la ligne
+([`docs/ligne-cmaes.md`](docs/ligne-cmaes.md)) : l'escalade, du grossier au fin (des gènes tous les 40 m, puis 20 m),
+bat la courbure minimale de 1,79 s en moyenne sur les 25 pistes ; CMA-ES ne fait au mieux que l'égaler. La recherche du cadrage est dans
 [`docs/recherche/`](docs/recherche/README.md), les jalons suivants dans [`docs/recherche/pistes.md`](docs/recherche/pistes.md).
 
 ## Les commandes
