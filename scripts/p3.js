@@ -11,10 +11,11 @@ import { searchWindowCmaes } from "../src/search/window-cmaes.js";
 import { readTrack } from "./lib/tracks.js";
 
 /**
- * `node scripts/p3.js Track cmaes|fine [--seeds 3]`, one queue job a track and a part (docs/ligne-cmaes.md, §§ 5-6):
+ * `node scripts/p3.js Track cmaes|fine|finer [--seeds 3]`, one queue job a track and a part (docs/ligne-cmaes.md, §§ 4-8):
  * - `cmaes`: CMA-ES again at 40 m from the minimum-curvature line, a population four times the default, a step of
  *   0.1, by windows of 12 genes, against the climb, at 20 000 and 100 000 lines;
- * - `fine`: the climb at 40, 20 and 10 m, and from coarse to fine (40 → 20, 80 → 40 → 20), at 100 000 and 300 000.
+ * - `fine`: the climb at 40, 20 and 10 m, and from coarse to fine (40 → 20, 80 → 40 → 20), at 100 000 and 300 000;
+ * - `finer`: from coarse to fine down to 10 m (40 → 20 → 10, 20 → 10) against 40 → 20, at 100 000 and 300 000.
  * One JSON line a run in tmp/p3/<Track>-<part>.jsonl; the lines of seed 1 in tmp/p3/lines/<Track>-<part>.json (the
  * check of P2 reads the climb's at 40 m and 100 000 lines).
  */
@@ -57,6 +58,14 @@ const PARTS = {
       climb10: onGenes(10, searchClimb),
       coarse40to20: ({ budget, seed }) => searchCoarseToFine(problem, { spacings: [40, 20], budget, seed, every: budget / 10 }),
       coarse80to20: ({ budget, seed }) => searchCoarseToFine(problem, { spacings: [80, 40, 20], budget, seed, every: budget / 10 }),
+    },
+  },
+  finer: {
+    budgets: [100000, 300000],
+    methods: {
+      coarse40to20: ({ budget, seed }) => searchCoarseToFine(problem, { spacings: [40, 20], budget, seed, every: budget / 10 }),
+      coarse40to10: ({ budget, seed }) => searchCoarseToFine(problem, { spacings: [40, 20, 10], budget, seed, every: budget / 10 }),
+      coarse20to10: ({ budget, seed }) => searchCoarseToFine(problem, { spacings: [20, 10], budget, seed, every: budget / 10 }),
     },
   },
 };

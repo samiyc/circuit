@@ -7,7 +7,7 @@ import { createProfile, lapTime } from "../src/profile/profile.js";
 import { readTrack } from "./lib/tracks.js";
 
 /**
- * `node scripts/p3-summary.js`: the measures of scripts/p3.js (docs/ligne-cmaes.md, §§ 5-7). For each part and
+ * `node scripts/p3-summary.js`: the measures of scripts/p3.js (docs/ligne-cmaes.md, §§ 4-8). For each part and
  * budget, each method's mean gain on the minimum-curvature line and its pairs against the part's reference (the climb
  * at 40 m), on the same track and seed. Then the check of P2: the apex shifts and the exit speeds of the climb's line
  * (40 m, 100 000 lines, seed 1) against the minimum curvature, by the length of the straight after the corner.
@@ -18,7 +18,7 @@ const rows = readdirSync("tmp/p3")
 const reference = new Map(rows.filter((row) => !row.method).map((row) => [row.track, row.minCurvature]));
 const runs = rows.filter((row) => row.method);
 const decimal = (value, digits = 2) => value.toFixed(digits).replace(".", ",");
-const REFERENCE_OF = { cmaes: "climb", fine: "climb40" };
+const REFERENCE_OF = { cmaes: "climb", fine: "climb40", finer: "coarse40to20" };
 
 /** One line: a method at a budget, its gain, and its pairs against the part's reference. */
 function line(part, budget, method) {
@@ -37,7 +37,7 @@ function line(part, budget, method) {
 }
 
 function tables() {
-  for (const part of ["cmaes", "fine"]) {
+  for (const part of ["cmaes", "fine", "finer"]) {
     const mine = runs.filter((r) => r.part === part);
     if (mine.length === 0) continue;
     console.log(`\n### ${part} (contre ${REFERENCE_OF[part]})\n`);
