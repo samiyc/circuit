@@ -75,6 +75,9 @@ C'est la première vraie question du projet.
   premier des deux projets qui en a besoin.
 - **La question** : à temps de calcul égal, le pas convexe bat-il CMA-ES ? Et CMA-ES, parti de la ligne des deux
   étapes, gagne-t-il encore ?
+- **Mesuré le 14/11** ([../ligne-cmaes.md](../ligne-cmaes.md) § 8) : l'étape 2 de Stanford minimise Σκ² sans
+  pondération ; pour notre point matériel, c'est la courbure minimale. Une descente du temps au tour (pas convexe,
+  la courbure comme métrique) ne bat pas la recherche seule (0,80 s contre 2,00 s), mais la finit (+0,11 s).
 
 ## P5. L'optimisation bayésienne (plus tard)
 

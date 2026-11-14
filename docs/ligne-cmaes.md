@@ -239,14 +239,92 @@ Les comparaisons directes, par paires :
 **La course aux configurations** (`mcts-race`, prévue par P3) n'a pas servi : la mesure complète, par paires sur les
 25 pistes, coûte une heure de file et tranche nettement.
 
-## 7. La suite proposée
+## 7. Jusqu'à 10 m : « 40 → 20 → 10 »
 
-- **« 40 → 20 → 10 »** : l'étape à 10 m, partie d'une ligne déjà bonne, devrait aller plus loin que l'escalade à 10 m
-  seule, qui n'a pas fini. C'est une mesure courte, sur le même dispositif.
-- **P4, les deux étapes de Stanford** ([recherche/pistes.md](recherche/pistes.md)) : un pas convexe sur la courbure
-  pondérée par la vitesse, avec le QP de la lib (`mcts-commun/src/qp.js` existe désormais). La question devient : ce
-  pas bat-il « 40 → 20 », à calcul égal ? Et « 40 → 20 », parti de sa ligne, gagne-t-il encore ?
-- **Le banc de recherche** (`scripts/search-bench.js`, prévu par `CLAUDE.md`) : « 40 → 20 » à 100 000 lignes sur
-  quelques pistes, pour suivre son coût et son gain d'un commit à l'autre.
-- **La page (J3)** montrera les deux lignes et leurs cordes, virage par virage. Elle permettra de regarder le recul
-  de la Parabolica plutôt que de le lire dans un tableau.
+Accordé par Sami le 14/11 (« OK pour la suite et le banc »). `scripts/p3.js Piste finer`, le dispositif du § 6 :
+du grossier au fin jusqu'à des gènes tous les 10 m, en trois étapes (« 40 → 20 → 10 ») ou en deux (« 20 → 10 »),
+contre « 40 → 20 », le meilleur réglage du § 6. Mesuré le 14/11 dans la file (25 tâches, 450 recherches).
+
+| Méthode | Budget | Gain (s) | − « 40 → 20 » (s, IC 95 %) | gagne / perd | Calcul (s) |
+|---|---|---|---|---|---|
+| 40 → 20 | 100000 | 1,79 | – | – | 9,6 |
+| 40 → 20 → 10 | 100000 | 2,00 | 0,21 [0,17 ; 0,25] | 72/3 | 9,8 |
+| 20 → 10 | 100000 | 1,88 | 0,09 [0,03 ; 0,15] | 53/22 | 9,7 |
+| 40 → 20 | 300000 | 1,82 | – | – | 29,2 |
+| 40 → 20 → 10 | 300000 | 2,06 | 0,24 [0,20 ; 0,28] | 75/0 | 29,2 |
+| 20 → 10 | 300000 | 1,97 | 0,15 [0,09 ; 0,20] | 59/16 | 29,2 |
+
+**Ce que la mesure tranche** :
+
+1. **« 40 → 20 → 10 » est le meilleur réglage mesuré** : 2,00 s gagnées sur la courbure minimale à 100 000 lignes
+   (10 s de calcul par piste), 0,21 s de mieux que « 40 → 20 ». Il passe sous la courbure minimale sur les
+   25 pistes, de 0,16 s (IMS) à 3,05 s (Melbourne). Les graines s'accordent à 0,12 s près sur chaque piste.
+2. **Les 10 m servent quand on y arrive par étapes** : l'escalade à 10 m seule ne faisait pas mieux qu'à 40 m (§ 6),
+   « 20 → 10 » gagne 0,09 s sur « 40 → 20 », et « 40 → 20 → 10 » 0,21 s.
+3. **Le budget compte peu** : de 100 000 à 300 000 lignes, « 40 → 20 → 10 » gagne 0,06 s.
+
+C'est désormais la recherche de référence : celle du banc (`npm run search-bench`, 2,04 / 2,74 / 2,94 s à Monza,
+Budapest et Silverstone) et celle contre laquelle se mesure P4.
+
+## 8. P4 : un pas convexe contre la recherche
+
+**Ce que fait Stanford** (Kapania, Subosits et Gerdes, [arXiv 1902.00606](https://arxiv.org/html/1902.00606v1),
+éq. 15) : l'étape 2 minimise Σκ², la courbure seule, **sans pondération par la vitesse**, sous les bornes de la piste.
+La vitesse n'y entre que par le modèle de vélo à pneus linéarisés qui relie le braquage à la ligne. Pour notre point
+matériel, cette étape redonne exactement la courbure minimale du J1 : leur première itération est notre référence, et
+les suivantes n'y changent rien. [recherche/pistes.md](recherche/pistes.md) annonçait « la courbure pondérée par la
+vitesse » : c'était notre lecture, pas leur méthode.
+
+**Deux pas essayés à Monza** (des prototypes, une piste) :
+
+- **la courbure pondérée par ce qu'elle coûte en temps** : chaque point pèse la sensibilité du temps au tour à sa
+  courbure, prise sur le profil. Le pas fait pire que la courbure minimale (de 86 à 95 s selon le plancher des poids, contre 81,05 s), même
+  limité à 1 cm (81,36 s) : la ligne ondule là où les poids sont faibles. Avec des poids lissés sur ±300 m, il gagne
+  0,07 s au mieux. Abandonné ;
+- **la descente du temps au tour** (`src/search/time-descent.js`, testée) : le gradient du temps au tour en chaque
+  écart, par différences centrées (2n temps au tour, n les points de la piste), puis le pas qui minimise
+  gᵀd + ½·c·(Σ dsᵢ·(Jd)ᵢ² + δ·|d|²) dans la piste, J la courbure linéarisée (`src/line/curvature-model.js`). Un
+  pas courbe la ligne au prix de sa courbure, la métrique de la courbure minimale. C'est un problème convexe, résolu
+  par `descend`. La raideur c est une région de confiance : divisée par 2 après un pas qui gagne, multipliée par 4
+  après un pas qui perd. Le temps au tour n'est pas lisse (le profil prend des minima), donc les pas restent de
+  l'ordre du millimètre. Le QP de la lib n'a pas servi : il est dense, et `descend` suffit pour des bornes seules.
+
+**La mesure** (`scripts/p4.js`, puis `scripts/p4-summary.js`) : les 25 pistes, 3 graines pour la recherche (la
+descente ne tire rien), à temps au tour notés égaux. Mesuré le 14/11 dans la file (25 tâches).
+
+| Méthode | Gain moyen (s) | Le moins / le plus (s) | Calcul (s) |
+|---|---|---|---|
+| la descente depuis la courbure minimale, 100 000 | 0,80 | 0,04 / 1,88 | – |
+| la même, 300 000 | 0,96 | 0,04 / 2,39 | 25,6 |
+| 40 → 20 → 10, 100 000 | 2,00 | 0,16 / 3,09 | 9,8 |
+| 40 → 20 → 10, 200 000 | 2,04 | 0,16 / 3,14 | 19,5 |
+| 40 → 20 → 10 (100 000), puis la descente (100 000) | 2,15 | 0,16 / 3,38 | 9,8 + 9,0 |
+
+| Comparaison | Écart (s, IC 95 %) | gagne / perd |
+|---|---|---|
+| la descente contre 40 → 20 → 10, à 100 000 | -1,19 [-1,31 ; -1,08] | 0/75 |
+| 40 → 20 → 10 puis la descente contre 40 → 20 → 10, à 200 000 | 0,11 [0,09 ; 0,13] | 72/3 |
+| 40 → 20 → 10 à 200 000 contre 100 000 | 0,04 [0,03 ; 0,05] | 67/8 |
+
+Les 75 paires de la première comparaison ne comptent que 25 descentes (une par piste) : son intervalle est trop
+étroit, mais l'écart est sans appel (aucune paire gagnée).
+
+**Ce que la mesure tranche** :
+
+1. **Le pas convexe seul ne bat pas la recherche** : parti de la courbure minimale, il gagne 0,80 s à 100 000 temps
+   au tour, contre 2,00 s pour « 40 → 20 → 10 ». Il s'arrête sur un coin du temps au tour, loin du meilleur.
+2. **Il sert en finition** : après « 40 → 20 → 10 », 100 000 temps au tour de descente gagnent 0,11 s de plus que
+   100 000 lignes de recherche, sur 72 paires sur 75. La descente travaille point par point (5 m), plus fin que les
+   gènes à 10 m. « 40 → 20 → 10 puis la descente » gagne 2,15 s sur la courbure minimale, le meilleur réglage
+   mesuré, en 19 s de calcul par piste.
+3. **La question de P4 est donc tranchée sur ce modèle** : un pas convexe ne remplace pas la recherche, il la finit.
+   Le pas de Stanford lui-même (Σκ² seul) est notre courbure minimale, battue de 2 s.
+
+## 9. La suite proposée
+
+- **La page (J3)** : montrer les lignes (courbure minimale, recherche, finition) et leurs cordes, virage par virage,
+  et le recul de la Parabolica.
+- **Le pilote (J4, P6-P7)** : suivre la ligne tick par tick ; la ligne est maintenant assez bonne pour qu'on lui
+  demande d'être tenue.
+- **Ce qui reste ouvert sur la ligne** : le modèle de la voiture (point matériel, ni rapports ni transfert de charge,
+  décidé par Sami le 14/11) borne ce que ces gains valent pour une vraie F1. Un modèle plus riche referait P2 à P4.
