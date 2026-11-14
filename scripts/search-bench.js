@@ -6,17 +6,18 @@ import { searchCoarseToFine } from "../src/search/refine.js";
 import { readTrack, tracksDownloaded } from "./lib/tracks.js";
 
 /**
- * `npm run search-bench [-- budget=100000 seeds=1 spacings=40,20 Piste…]`: the search of reference (docs/ligne-cmaes.md,
- * § 6: the climb from coarse to fine, genes every 40 m then 20 m, from the minimum-curvature line) on a few tracks, its
- * gain on the minimum curvature and its cost, to follow from one commit to the next. Seeded: the same arguments give
- * the same times. About 10 s a track and a seed at 100 000 lines; longer runs go through the queue.
+ * `npm run search-bench [-- budget=100000 seeds=1 spacings=40,20,10 Piste…]`: the search of reference
+ * (docs/ligne-cmaes.md, § 7: the climb from coarse to fine, genes every 40 m, then 20 m, then 10 m, from the
+ * minimum-curvature line) on a few tracks, its gain on the minimum curvature and its cost, to follow from one commit
+ * to the next. Seeded: the same arguments give the same times. About 10 s a track and a seed at 100 000 lines; longer
+ * runs go through the queue.
  */
 const DEFAULT_TRACKS = ["Monza", "Budapest", "Silverstone"];
 const args = process.argv.slice(2);
 const settings = Object.fromEntries(args.filter((arg) => arg.includes("=")).map((arg) => arg.split("=")));
 const budget = Number(settings.budget ?? 100000);
 const seeds = Number(settings.seeds ?? 1);
-const spacings = (settings.spacings ?? "40,20").split(",").map(Number);
+const spacings = (settings.spacings ?? "40,20,10").split(",").map(Number);
 const named = args.filter((arg) => !arg.includes("="));
 const tracks = named.length ? named : DEFAULT_TRACKS;
 const decimal = (value, digits = 2) => value.toFixed(digits).replace(".", ",");

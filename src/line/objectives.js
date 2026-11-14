@@ -65,8 +65,14 @@ export function curvatureObjective(track) {
   };
 }
 
-/** The steps around point i into term[0..3]: a = pᵢ − pᵢ₋₁, b = pᵢ₊₁ − pᵢ. */
-function fillSteps(px, py, indices, term) {
+/**
+ * The steps around point i into term[0..3]: a = pᵢ − pᵢ₋₁, b = pᵢ₊₁ − pᵢ (src/line/curvature-model.js reads them too).
+ * @param {Float64Array} px
+ * @param {Float64Array} py
+ * @param {Int32Array} indices the previous point, this one, the next
+ * @param {number[]} term
+ */
+export function fillSteps(px, py, indices, term) {
   const h = indices[0];
   const i = indices[1];
   const j = indices[2];
@@ -80,7 +86,7 @@ function fillSteps(px, py, indices, term) {
  * κ into term[4] and ∂κ/∂p at the previous, this and the next point into term[5..10]: ∂(a × b)/den − κ·∂ln(den).
  * @param {number[]} term
  */
-function fillCurvature(term) {
+export function fillCurvature(term) {
   const [ax, ay, bx, by] = term;
   const cx = ax + bx;
   const cy = ay + by;

@@ -64,8 +64,8 @@ Its line in the roadmap: `mcts-commun/docs/feuille-de-route.md`, § 2.C. Start t
 - **The bench** (`npm run bench`, `scripts/profile-bench.js`): the cost of a lap time; its hot path does not
   allocate (no `Math.hypot` there: twice the cost of a square root).
 - **The search bench** (`npm run search-bench`, `scripts/search-bench.js`): the search of reference (from coarse to
-  fine, 40 m then 20 m, `docs/ligne-cmaes.md` § 6) on Monza, Budapest and Silverstone, seed 1, 100 000 lines: 1,62 /
-  2,51 / 2,84 s gained, about 10 s a track. A change to the search says what it does to these figures.
+  fine, 40 m, 20 m then 10 m, `docs/ligne-cmaes.md` § 7) on Monza, Budapest and Silverstone, seed 1, 100 000 lines:
+  2.04 / 2.74 / 2.94 s gained, about 10 s a track. A change to the search says what it does to these figures.
 
 ## To add when their turn comes
 

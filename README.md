@@ -23,7 +23,7 @@ bat la courbure minimale de 1,79 s en moyenne sur les 25 pistes ; CMA-ES ne fait
 | `npm run tracks` | télécharge les 25 pistes de TU Munich dans `data/tum/` (ignoré par git) ; à lancer une fois |
 | `npm run references [Piste…]` | les trois lignes de référence et leurs temps au tour, contre la ligne de TU Munich (long : par la file) |
 | `npm run bench` | le coût d'un temps au tour, par tour et par point, et ce qu'il alloue |
-| `npm run search-bench [-- budget=… seeds=… spacings=40,20 Piste…]` | la recherche de référence (du grossier au fin) sur trois pistes : son gain et son coût |
+| `npm run search-bench [-- budget=… seeds=… spacings=40,20 Piste…]` | la recherche de référence (du grossier au fin, 40, 20 puis 10 m) sur trois pistes : son gain et son coût |
 | `npm run check` | le lint, les types, puis les tests ; c'est ce que lance le hook |
 | `npm run lint` (`lint:fix`) | eslint, avec le budget de complexité de lopin |
 | `npm run types` | tsc vérifie le JavaScript d'après ses commentaires JSDoc, sans rien compiler |
