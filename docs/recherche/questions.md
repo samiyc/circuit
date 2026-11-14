@@ -209,3 +209,15 @@ reste ouvert le dit. Notre simulation tranchera une partie des questions seule (
   <https://arxiv.org/abs/2412.15379>
 - La voiture : TU Munich, `laptime-simulation`,
   <https://github.com/TUMFTM/laptime-simulation/blob/master/laptimesim/input/vehicles/F1_Shanghai.ini>
+
+## 5. Les décisions du J1 (Sami, 14/11)
+
+Trois questions posées à la fin du J1 ([../modele.md](../modele.md)), chacune avec une recommandation. Sami : « Ok pour
+les trois ».
+
+1. **La demi-largeur de la voiture vaut 1 m**, celle d'une F1 de 2017 à 2025, sans marge de sécurité. Les lignes de
+   TU Munich gardent 0,75 m du bord : la comparaison avec elles se fait à leur marge.
+2. **Le modèle de la voiture reste le point matériel** : pas de rapports, pas de DRS, pas de transfert de charge tant
+   qu'aucune question ne l'exige. Ces simplifications ne changent pas l'ordre des lignes sous un même modèle.
+3. **Le J2 commence** : CMA-ES sur les écarts, noté par le temps au tour, contre l'escalade et la courbure minimale
+   (P2 de [pistes.md](pistes.md)).

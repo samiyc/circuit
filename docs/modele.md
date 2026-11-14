@@ -82,7 +82,7 @@ Code : `src/line/`. Une ligne, c'est un écart par point de la piste.
 - **Les bornes** : les bords moins une demi-largeur de voiture, **1 m par défaut**. Une F1 mesure 2 000 mm au plus de
   2017 à 2025 ([Motor Sport, avril 2017](https://www.motorsportmagazine.com/archive/article/april-2017/82/new-year-new-rules/) ;
   [f1technical](https://f1technical.net/articles/12497)), et la F1 de TU Munich date de 2019. Aucune marge de
-  sécurité n'est ajoutée : c'est une **hypothèse**, et une question pour Sami.
+  sécurité n'est ajoutée : décidé avec Sami le 14/11 ([recherche/questions.md](recherche/questions.md) § 5).
 - **Le centre** : tous les écarts à zéro.
 - **La plus courte** : la longueur de la ligne fermée.
 - **La courbure minimale** : l'énergie de flexion ∫κ²·ds, soit la courbure de Menger au carré en chaque point,
@@ -197,9 +197,8 @@ majorants. Chaque tour place une ligne d'écarts tirés par graine, puis la note
 ## 8. Ce qui reste ouvert
 
 - **Les hypothèses du § 2** : le point matériel, la boîte idéale et l'absence de DRS. Elles ne changent pas l'ordre
-  des lignes sous un même modèle. Elles comptent le jour où l'on compare nos temps aux vrais.
-- **La demi-largeur** : 1 m (la F1, sans marge), 0,75 m (les lignes de TU Munich) ou 1,7 m (leur optimiseur). C'est
-  une question pour Sami.
+  des lignes sous un même modèle, et elles restent tant qu'aucune question ne l'exige (Sami, 14/11). Elles compteront
+  le jour où l'on comparera nos temps aux vrais.
 - **Le grossier au fin** (P3) accélérerait la courbure minimale, qui prend 2 s par piste à 5 m. Ce n'est pas
   nécessaire au J1.
 - **Les pistes tirées par graine** ([recherche/bancs.md](recherche/bancs.md) § 4) attendent le J2, avec la course aux
