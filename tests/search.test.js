@@ -8,6 +8,8 @@ import { createShape, fitGenes, placeGenes } from "../src/line/spline.js";
 import { createProfile, lapTime } from "../src/profile/profile.js";
 import { createLineScore } from "../src/search/line-score.js";
 import { searchClimb, searchCmaes } from "../src/search/line-search.js";
+import { searchCoarseToFine } from "../src/search/refine.js";
+import { searchWindowCmaes } from "../src/search/window-cmaes.js";
 import { roundedPolygon } from "../src/track/shapes.js";
 import { createTrack } from "../src/track/track.js";
 
@@ -74,4 +76,34 @@ describe("the searches of P2", () => {
       assert.deepEqual(run(), first);
     });
   }
+});
+
+describe("the variants of the J2 measure", () => {
+  const shape = createShape(track, bounds, { spacing: 40, base: minCurvature });
+  const centre = fitGenes(shape, new Float64Array(track.count));
+
+  it("CMA-ES by windows improves on its start within its budget, and replays from its seed", () => {
+    const run = () => searchWindowCmaes(createLineScore(track, F1, shape), { start: centre, budget: 2000, seed: 3, width: 8, stride: 4, chunk: 200 });
+    const first = run();
+    assert.ok(first.time < createLineScore(track, F1, shape).time(centre) - 0.1);
+    assert.ok(first.evaluations <= 2000);
+    assert.ok(Math.abs(createLineScore(track, F1, shape).time(first.genes) - first.time) < 1e-12);
+    assert.deepEqual(run(), first);
+  });
+
+  it("CMA-ES takes a larger population", () => {
+    const result = searchCmaes(createLineScore(track, F1, shape), { start: centre, budget: 1000, seed: 1, population: 40 });
+    assert.equal(result.evaluations, 1 + 40 * 24);
+  });
+
+  it("from coarse to fine: each stage starts from the last, the finest line in its bounds", () => {
+    const problem = { track, car: F1, bounds, base: minCurvature };
+    const result = searchCoarseToFine(problem, { spacings: [80, 40], budget: 2000, seed: 2 });
+    const reference = lapTime(F1, linePoints(track, minCurvature), createProfile(track.count));
+    assert.ok(result.time < reference, `${result.time} against ${reference}`);
+    assert.equal(result.genes, createShape(track, bounds, { spacing: 40 }).genes);
+    assert.ok(Math.abs(lapTime(F1, linePoints(track, result.offsets), createProfile(track.count)) - result.time) < 1e-12);
+    result.offsets.forEach((offset, i) => assert.ok(offset >= bounds.lower[i] && offset <= bounds.upper[i]));
+    assert.deepEqual(searchCoarseToFine(problem, { spacings: [80, 40], budget: 2000, seed: 2 }), result);
+  });
 });

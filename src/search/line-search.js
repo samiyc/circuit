@@ -31,13 +31,14 @@ function createCurve(every) {
 }
 
 /**
- * CMA-ES from `start`, a first step `sigma` (0.3 of the mean half room by default, docs/recherche/pistes.md, P2).
+ * CMA-ES from `start`, a first step `sigma` (0.3 of the mean half room by default, docs/recherche/pistes.md, P2), a
+ * `population` a generation (the library's 4 + 3·ln n by default).
  * @param {LineScore} scorer
- * @param {{ start: Float64Array, budget: number, seed: number, sigma?: number, every?: number }} options
+ * @param {{ start: Float64Array, budget: number, seed: number, sigma?: number, population?: number, every?: number }} options
  * @returns {SearchResult}
  */
-export function searchCmaes(scorer, { start, budget, seed, sigma = 0.3, every = 1000 }) {
-  const strategy = createCmaes({ genes: start.length, mean: start, sigma, seed });
+export function searchCmaes(scorer, { start, budget, seed, sigma = 0.3, population, every = 1000 }) {
+  const strategy = createCmaes({ genes: start.length, mean: start, sigma, population, seed });
   const trace = createCurve(every);
   const scores = new Float64Array(strategy.population);
   const startTime = scorer.time(start);
