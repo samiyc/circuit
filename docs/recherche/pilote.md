@@ -60,8 +60,8 @@ Le point matériel du profil de vitesse ne glisse pas. Pour un pilote, il faut :
 - **un modèle de pneu** : un effort latéral qui croît avec l'angle de dérive, puis sature. La « formule magique » de
   Pacejka est la référence. Les voitures de Liniger dérivent quand les pneus arrière saturent (§ 2).
 
-Les détails et coefficients sont **à chercher au cadrage de J4**. Rien n'est sourcé ici au-delà de l'existence de
-ces modèles.
+Les détails et les coefficients, cherchés au cadrage du J4 (15/11), sont dans [../pilote.md](../pilote.md) § 2 : le pneu
+de F1 de Perantoni et Limebeer (2014), les figures de la F1 de TUM, et ce qui reste une hypothèse.
 
 ## 5. L'apprentissage par renforcement
 

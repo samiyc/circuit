@@ -8,13 +8,15 @@ ligne ; puis un pilote qui la suit tour par tour, à la souris ou au clavier pou
 Client de [`mcts-commun`](../mcts-commun/README.md). La recherche sera choisie par la mesure, contre la ligne la plus
 courte, la ligne à courbure minimale et un pilote qui les suit (poursuite pure).
 
-**État** (14/11) : le J1 est fait. Il y a la piste au format de TU Munich, la F1 de leur `laptime-simulation` en
+**État** (15/11) : le J1 est fait. Il y a la piste au format de TU Munich, la F1 de leur `laptime-simulation` en
 point matériel, le profil de vitesse (la note d'une ligne), les trois lignes de référence, leurs tests et le banc de
 la note. Le modèle et ses mesures sont dans [`docs/modele.md`](docs/modele.md). Le J2 (14/11) cherche la ligne
 ([`docs/ligne-cmaes.md`](docs/ligne-cmaes.md)) : l'escalade du grossier au fin (des gènes tous les 40 m, puis 20 m,
 puis 10 m), finie par une descente du temps au tour, bat la courbure minimale de 2,15 s en moyenne sur les
 25 pistes ; CMA-ES ne fait au mieux que l'égaler l'escalade. Le J3 (14/11) est la page : un circuit vu de dessus,
-deux lignes et leurs fantômes, le profil de vitesse, l'écart de temps et le tableau des virages. La recherche du cadrage est dans
+deux lignes et leurs fantômes, le profil de vitesse, l'écart de temps et le tableau des virages. Le J4 (15/11) met sur
+la piste une voiture qui glisse, une bicyclette aux pneus de F1, et la poursuite pure qui la tient sur la ligne : 5,5 %
+plus lente que son profil sur la courbure minimale ([`docs/pilote.md`](docs/pilote.md)). La recherche du cadrage est dans
 [`docs/recherche/`](docs/recherche/README.md), les jalons suivants dans [`docs/recherche/pistes.md`](docs/recherche/pistes.md).
 
 ## Les commandes
@@ -28,6 +30,7 @@ deux lignes et leurs fantômes, le profil de vitesse, l'écart de temps et le ta
 | `npm run page` | la page, sur http://127.0.0.1:4809/web/ |
 | `npm run changelog` | `web/changelog.html` depuis `docs/changelog.json` |
 | `npm run bench` | le coût d'un temps au tour, par tour et par point, et ce qu'il alloue |
+| `npm run drive [Piste…]` | la voiture qui glisse, pilotée par la poursuite pure sur les lignes de `data/lines/` : son temps contre son profil, en 2 s |
 | `npm run search-bench [-- budget=… seeds=… spacings=40,20,10 Piste…]` | la recherche de référence (du grossier au fin, 40, 20 puis 10 m) sur trois pistes : son gain et son coût |
 | `npm run check` | le lint, les types, puis les tests ; c'est ce que lance le hook |
 | `npm run lint` (`lint:fix`) | eslint, avec le budget de complexité de lopin |

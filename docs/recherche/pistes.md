@@ -97,8 +97,8 @@ pas, et ses entrées tremblent.
 
 ## P7. Le pilote (J4)
 
-- **Le modèle** : la bicyclette, avec un pneu qui sature (coefficients à chercher au cadrage de J4).
-- **Les pilotes** : la poursuite pure (la règle à battre), le faisceau sur les prochains pas, l'escalade sur un plan
+- **Le modèle** : la bicyclette, avec un pneu qui sature. Fait le 15/11 ([../pilote.md](../pilote.md) § 2).
+- **Les pilotes** : la poursuite pure (la règle à battre, mesurée le 15/11 : [../pilote.md](../pilote.md) § 5), le faisceau sur les prochains pas, l'escalade sur un plan
   de quelques pas comme sur Mad Pod Racing.
 - **La mesure** : le temps au tour et l'écart à la ligne, sur les mêmes pistes, avec des perturbations tirées par
   graine (un coup de vent, une plaque glissante).

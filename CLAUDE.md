@@ -66,6 +66,10 @@ Its line in the roadmap: `mcts-commun/docs/feuille-de-route.md`, § 2.C. Start t
 - **The search bench** (`npm run search-bench`, `scripts/search-bench.js`): the search of reference (from coarse to
   fine, 40 m, 20 m then 10 m, `docs/ligne-cmaes.md` § 7) on Monza, Budapest and Silverstone, seed 1, 100 000 lines:
   2.04 / 2.74 / 2.94 s gained, about 10 s a track. A change to the search says what it does to these figures.
+- **The driver** (J4, `docs/pilote.md`, `src/drive/`): a dynamic bicycle with Perantoni and Limebeer's F1 tyre, a
+  100 Hz tick, and the pure-pursuit driver as the rule to beat. `npm run drive` drives the lines of `data/lines/` on
+  the 25 tracks (2 s): 24/25 laps of the minimum-curvature line, 5.5 % over the bicycle's profile (`profileCar`, the
+  point mass at the front axle's μy). A change to the car or the driver says what it does to these figures.
 
 ## The page
 
