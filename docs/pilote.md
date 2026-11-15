@@ -83,15 +83,15 @@ Les trois leçons de sa mise au point, sur Monza :
 3. **La poursuite pure seule laisse la voiture dériver vers l'extérieur** des virages rapides, de 2 à 5 m : la
    voiture sous-vire, et la poursuite pure ne corrige pas un écart durable. Le terme de Stanley le ramène.
 
-Les six réglages sont des hypothèses posées à la main sur Monza. Une recherche les réglera (P7, § 6).
+Les six réglages ont été posés à la main sur Monza, puis réglés par CMA-ES (P7, § 6).
 
-| Réglage | Valeur |
-|---|--:|
-| anticipation de la visée | 0,25 s, 8 m au moins |
-| part de la vitesse du profil | 1 |
-| gain de vitesse | 0,1 par m/s |
-| anticipation de la vitesse | 0,3 s |
-| gain de Stanley k | 1 /s |
+| Réglage | À la main (`PURSUIT`) | Réglé par P7 (`TUNED`) |
+|---|--:|--:|
+| anticipation de la visée | 0,25 s, 8 m au moins | 0,22 s, 3 m au moins |
+| part de la vitesse du profil | 1 | 0,96 |
+| gain de vitesse | 0,1 par m/s | 0,09 par m/s |
+| anticipation de la vitesse | 0,3 s | 0,31 s |
+| gain de Stanley k | 1 /s | 0 |
 
 ## 4. Le tour piloté
 
@@ -124,16 +124,65 @@ bicyclette (15/11).
 - **Suzuka arrête les deux lignes** au premier virage (12,6 s), et la courbure minimale seule de Montréal à Zandvoort
   passe partout ailleurs.
 
-## 6. La suite
+## 6. P7 : le pilote réglé par CMA-ES
 
-- **P7, régler le pilote** : CMA-ES sur ses réglages, sur la moitié des pistes, validé sur l'autre moitié. Le temps
-  au tour noté avec une pénalité par seconde hors piste.
-- **Sami aux commandes** (P9) : le clavier et la manette sur la page, contre les fantômes de la ligne et du pilote.
-- **Les pilotes par recherche** : le faisceau et l'escalade sur un plan de quelques pas, comme sur Mad Pod Racing.
+`scripts/p7.js` (15/11, par la file, 3 min par graine) règle les six réglages par CMA-ES, chaque gène ramené dans
+[0, 1] sur une plage. L'entraînement se fait sur les 12 pistes de rang pair, la vérification sur les 13 autres, avec les
+deux lignes à chaque fois. Un tour vaut (temps + secondes hors piste) / profil − 1, et un tour arrêté vaut 0,5.
+CMA-ES tourne 40 générations, avec 3 graines.
+
+| | Score d'entraînement | Score de vérification |
+|---|--:|--:|
+| à la main | 0,232 | 0,117 |
+| graine 1 | 0,086 | 0,097 |
+| graine 2 | 0,088 | 0,100 |
+| graine 3 | 0,092 | 0,106 |
+
+Les trois graines battent la règle à la main sur les pistes qu'elles n'ont pas vues. Elles trouvent la même chose :
+**finir vaut mieux qu'aller vite**. La marge tombe à 0,96 et le terme de Stanley disparaît, car il ne servait qu'à
+tenir une voiture poussée à la limite. Sur les 25 pistes (`npm run drive`) :
+
+| Ligne | À la main : tours finis, écart au profil | Réglé : tours finis, écart au profil |
+|---|--:|--:|
+| courbure minimale | 24 / 25, 5,5 % | **25 / 25**, 7,6 % |
+| la meilleure | 13 / 25, 6,7 % | **24 / 25**, 8,2 % |
+
+Le réglé ne s'arrête plus qu'à Oschersleben, au premier virage de la meilleure ligne. Il garde 0,2 à 1,6 s hors piste
+sur la meilleure ligne, et presque rien sur la courbure minimale. C'est le pilote de la page.
+
+## 7. Sami aux commandes : la page Piloter
+
+`web/drive.html` (P9, 15/11) : la voiture de Sami et celle du pilote réglé partent ensemble de la ligne de départ, à la
+vitesse du profil. Le fantôme du profil de la ligne refait chaque tour avec lui. Les entrées passent par une fonction
+pure (`src/drive/input.js`), et la course par `src/drive/session.js`, tous deux testés.
+
+- **Le clavier** : flèche haut pour accélérer, Ctrl gauche (ou flèche bas) pour freiner, les flèches pour tourner. Une
+  touche est tout ou rien : le braquage met 0,25 s pour aller à la butée (une hypothèse).
+- **La manette** : A pour accélérer, RB pour freiner, la gâchette RT pour freiner en dosant, le stick gauche pour
+  tourner en proportion.
+- **À haute vitesse, la butée se réduit** à ce qui donne 50 m/s² (L·a / u², environ 5 g), comme dans un jeu de course.
+  Sans cela, une touche à fond à 300 km/h ferait partir la voiture en tête-à-queue d'un coup.
+- **La vue** : la caméra suit la voiture, son cap vers le haut. Le champ grandit avec la vitesse (2,5 s de route plus
+  60 m) pour voir le point de freinage, et une carte du circuit tient dans un coin.
+- **Le panneau** :
+  - la vitesse ;
+  - le temps du tour et l'écart au fantôme au même point ;
+  - le dernier tour et son temps hors piste ;
+  - le meilleur tour propre, gardé dans le navigateur ;
+  - le dernier tour du pilote.
+
+## 8. La suite
+
+- **Le retour de Sami** sur le pilotage : la direction au clavier, la butée réduite, le champ de vue. Ce sont des
+  hypothèses de jeu, à régler sur son ressenti.
+- **Les pilotes par recherche** : le faisceau et l'escalade sur un plan de quelques pas, comme sur Mad Pod Racing, contre
+  le pilote réglé.
+- **P6**, l'escalade sur les entrées pas à pas, après.
 
 **Question pour Sami** : faut-il recalculer les lignes pour la bicyclette, avec son profil au μy de l'avant ? Je le
-recommande, après P7 : la meilleure ligne actuelle est cherchée pour une voiture qui tourne 4 % plus vite. Le fantôme
-de la page serait alors un temps que la voiture peut tenir.
+recommande : la meilleure ligne actuelle est cherchée pour une voiture qui tourne 4 % plus vite. Le fantôme de la page
+Piloter suit déjà le profil de la bicyclette ; c'est la forme de la ligne qui reste celle du point matériel. Cela coûte
+une nuit de file (25 pistes à 25 s), et la page des lignes changerait de temps.
 
 ## Sources
 

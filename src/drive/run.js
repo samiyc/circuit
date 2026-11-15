@@ -55,8 +55,13 @@ export function sideOf(track, path, i, { x, y }) {
   return (x - path.x[i]) * track.nx[i] + (y - path.y[i]) * track.ny[i];
 }
 
-/** The points advanced from `from` to `to` on a closed line of n points, signed, the shorter way. */
-function advance(from, to, n) {
+/**
+ * The points advanced from `from` to `to` on a closed line of n points, signed, the shorter way.
+ * @param {number} from
+ * @param {number} to
+ * @param {number} n
+ */
+export function advance(from, to, n) {
   const delta = to - from;
   if (delta > n / 2) return delta - n;
   return delta < -n / 2 ? delta + n : delta;
@@ -104,7 +109,7 @@ export function driveLap({ track, path, car, drive, driver }, { state = startOf(
  * time, and the lap.
  * @param {Track} track
  * @param {Float64Array} offsets
- * @param {{ car?: Bicycle, settings?: typeof PURSUIT }} [options]
+ * @param {{ car?: Bicycle, settings?: import("./pursuit.js").Settings }} [options]
  * @returns {DrivenLap & { profile: number }}
  */
 export function driveLine(track, offsets, { car = createBicycle(), settings = PURSUIT } = {}) {

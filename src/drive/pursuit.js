@@ -12,9 +12,11 @@ import { gripShift, normalLoad, powerAt, resistance } from "../car.js";
  * @typedef {import("./bicycle.js").Bicycle} Bicycle
  * @typedef {import("./bicycle.js").CarState} CarState
  * @typedef {import("./bicycle.js").Controls} Controls
+ * @typedef {{ lookTime: number, lookMin: number, margin: number, gain: number, anticipation: number, crossGain: number }} Settings
  */
 
-/** Hypotheses, set by hand on Monza (docs/pilote.md § 3), for a search to tune. */
+/** Set by hand on Monza (docs/pilote.md § 3); a search may tune them (`TUNED`). */
+/** @type {Readonly<Settings>} */
 export const PURSUIT = Object.freeze({
   lookTime: 0.25, // s of the current speed, the look-ahead distance
   lookMin: 8, // m, the look-ahead at low speed
@@ -23,6 +25,10 @@ export const PURSUIT = Object.freeze({
   anticipation: 0.3, // s ahead of the car where the wanted speed is read
   crossGain: 1, // 1/s, Stanley's term: steer atan(k·e/u) towards the line, e the distance across it
 });
+
+/** P7 (docs/pilote.md § 6): CMA-ES on the tracks of even rank, seed 1, rounded; better on the others, all 25 laps. */
+/** @type {Readonly<Settings>} */
+export const TUNED = Object.freeze({ lookTime: 0.22, lookMin: 3, margin: 0.96, gain: 0.09, anticipation: 0.31, crossGain: 0 });
 
 /**
  * A line's path from its lap (src/view/lap.js): its points, its speeds and the accelerations between them.
@@ -63,7 +69,7 @@ export function gripLeft({ point }, { u, r }) {
 
 /**
  * @param {Path} path
- * @param {typeof PURSUIT} [settings]
+ * @param {Settings} [settings]
  */
 export function createPursuit(path, settings = PURSUIT) {
   return { path, settings, index: 0, controls: { steer: 0, pedal: 0 } };

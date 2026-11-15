@@ -35,3 +35,11 @@
 #corners tbody tr { cursor: pointer; }
 #corners td.gain { font-weight: 600; }
 #corners td.loss { color: #8e1b1b; }
+
+/* The drive (J4): the road fills the width, the panel sits over its top left corner. */
+.drive { position: relative; }
+#road { display: block; width: 100%; height: calc(100vh - 230px); min-height: 360px; background: #9bab6e; border: 1px solid var(--line); border-radius: var(--radius); outline: none; }
+.hud { position: absolute; top: 8px; left: 8px; padding: 8px 10px; background: rgb(232 232 205 / 0.88); border-radius: var(--radius); font-variant-numeric: tabular-nums; line-height: 1.45; }
+.hud b { font-size: 1.6rem; }
+.hud .gain { color: #2f5f00; font-weight: 600; }
+.hud .loss { color: #8e1b1b; font-weight: 600; }

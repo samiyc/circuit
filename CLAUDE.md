@@ -68,8 +68,11 @@ Its line in the roadmap: `mcts-commun/docs/feuille-de-route.md`, § 2.C. Start t
   2.04 / 2.74 / 2.94 s gained, about 10 s a track. A change to the search says what it does to these figures.
 - **The driver** (J4, `docs/pilote.md`, `src/drive/`): a dynamic bicycle with Perantoni and Limebeer's F1 tyre, a
   100 Hz tick, and the pure-pursuit driver as the rule to beat. `npm run drive` drives the lines of `data/lines/` on
-  the 25 tracks (2 s): 24/25 laps of the minimum-curvature line, 5.5 % over the bicycle's profile (`profileCar`, the
-  point mass at the front axle's μy). A change to the car or the driver says what it does to these figures.
+  the 25 tracks (3 s), by hand (`PURSUIT`) and tuned by CMA-ES (`TUNED`, `scripts/p7.js`): 24/25 and 25/25 laps of
+  the minimum-curvature line, 5.5 % and 7.6 % over the bicycle's profile (`profileCar`, the point mass at the front
+  axle's μy). A change to the car or the driver says what it does to these figures.
+- **The drive page** (`web/drive.html`, P9): Sami's car under his keys or gamepad (`src/drive/input.js`, pure),
+  against the tuned driver and the ghost of the line's profile (`src/drive/session.js`).
 
 ## The page
 

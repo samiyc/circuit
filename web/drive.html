@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Piloter</title>
+    <link rel="stylesheet" href="../node_modules/mcts-commun/web/theme.css" />
+    <link rel="stylesheet" href="style.css" />
+    <script type="importmap">
+      { "imports": { "mcts-commun/": "../node_modules/mcts-commun/src/" } }
+    </script>
+  </head>
+  <body>
+    <header class="masthead">
+      <p class="links"><a href="index.html">← les lignes</a> · <a href="changelog.html" id="version">Journal des versions</a></p>
+      <h1>Piloter</h1>
+      <p>La F1 qui glisse, au clavier ou à la manette, contre le fantôme de la ligne et contre le pilote de la poursuite pure.</p>
+    </header>
+    <main>
+      <section class="controls">
+        <label>Circuit<select id="track"></select></label>
+        <label>Ligne suivie<select id="line"></select></label>
+        <button type="button" id="restart">Recommencer (R)</button>
+        <button type="button" class="quiet" id="pause">Pause (Espace)</button>
+      </section>
+      <p class="summary" id="status" aria-live="polite">Chargement…</p>
+      <div class="drive">
+        <canvas id="road" tabindex="0" aria-label="La voiture vue de dessus, son cap vers le haut"></canvas>
+        <div class="hud" id="hud"></div>
+      </div>
+      <p class="hint">
+        <strong>Commandes.</strong> Clavier : flèche haut pour accélérer, Ctrl gauche (ou flèche bas) pour freiner, flèches gauche et droite pour tourner.
+        Manette : A pour accélérer, RB pour freiner, la gâchette RT pour freiner en dosant, le stick gauche pour tourner.
+        Ta voiture est rouge ; la claire est le pilote de la poursuite pure ; la blanche, transparente, est le fantôme du profil de vitesse de la ligne, le temps que la voiture pourrait faire.
+        L'écart se lit au même point du tour : positif, tu es derrière.
+      </p>
+    </main>
+    <script type="module" src="drive.js"></script>
+  </body>
+</html>

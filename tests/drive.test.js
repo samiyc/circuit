@@ -3,7 +3,9 @@ import assert from "node:assert/strict";
 import { pointMassF1 } from "../src/car.js";
 import { CHASSIS, createBicycle, createCarState, profileCar, stepCar } from "../src/drive/bicycle.js";
 import { createPursuit, gripLeft, nearestPoint, pathOf, pedalFor } from "../src/drive/pursuit.js";
+import { LATERAL_LIMIT, controlsOf, keyboardInput, lockAt, mergeInputs, padInput } from "../src/drive/input.js";
 import { driveLine, pastEdge, sideOf } from "../src/drive/run.js";
+import { createSession, lapGap, tickSession } from "../src/drive/session.js";
 import { PL_TYRE, lateralShare, peakSlip } from "../src/drive/tyre.js";
 import { lineBounds } from "../src/line/line.js";
 import { minCurvatureLine } from "../src/line/references.js";
@@ -104,5 +106,62 @@ describe("the pure-pursuit driver", () => {
     const car = { x: path.x[i] + 3 * track.nx[i], y: path.y[i] + 3 * track.ny[i] };
     assert.ok(Math.abs(sideOf(track, path, i, car) - 3) < 1e-9);
     assert.ok(Math.abs(pastEdge(track, i, car) - (3 - track.wLeft[i])) < 1e-9);
+  });
+});
+
+describe("Sami's hands", () => {
+  it("reads the keys he chose: Up, left Ctrl or Down, the arrows", () => {
+    assert.deepEqual(keyboardInput(new Set(["ArrowUp", "ArrowLeft"])), { throttle: 1, brake: 0, steer: 1, analog: false });
+    assert.equal(keyboardInput(new Set(["ControlLeft"])).brake, 1);
+    assert.equal(keyboardInput(new Set(["ArrowLeft", "ArrowRight"])).steer, 0);
+  });
+
+  it("reads the gamepad: A, RB or the RT trigger in proportion, the left stick", () => {
+    const button = (value) => ({ pressed: value > 0.5, value });
+    const buttons = Array.from({ length: 8 }, () => button(0));
+    buttons[0] = button(1);
+    buttons[7] = button(0.4);
+    const pad = padInput({ buttons, axes: [-0.5, 0] });
+    assert.deepEqual(pad, { throttle: 1, brake: 0.4, steer: 0.5, analog: true });
+    assert.equal(padInput({ buttons, axes: [0.05, 0] }).steer, 0);
+    assert.equal(padInput(null), null);
+    assert.equal(mergeInputs(keyboardInput(new Set()), pad).brake, 0.4);
+  });
+
+  it("brings a key's steering to the lock in a quarter of a second, the brake winning over the throttle", () => {
+    let share = 0;
+    for (let k = 0; k < 10; k += 1) share = controlsOf({ throttle: 1, brake: 0, steer: 1, analog: false }, share, { car: CAR, speed: 10, dt: 0.01 }).share;
+    assert.ok(Math.abs(share - 0.4) < 1e-9);
+    const controls = controlsOf({ throttle: 1, brake: 0.3, steer: 1, analog: true }, share, { car: CAR, speed: 10, dt: 0.01 });
+    assert.equal(controls.pedal, -0.3);
+    assert.equal(controls.steer, CAR.steerMax);
+  });
+
+  it("shrinks the lock at speed to about 5 g", () => {
+    assert.equal(lockAt(CAR, 5), CAR.steerMax);
+    assert.ok(Math.abs(lockAt(CAR, 80) - (CAR.wheelbase * LATERAL_LIMIT) / 6400) < 1e-12);
+  });
+});
+
+describe("a drive on the page", () => {
+  const square = createTrack(roundedPolygon({ sides: 4, straight: 200, radius: 30, spacing: 4, width: 14 }));
+  const lap = createLap(square, profileCar(CAR), minCurvatureLine(square, lineBounds(square)).offsets);
+  const path = pathOf(lap, square);
+
+  it("closes the driver's laps, as a driven lap does", () => {
+    const session = createSession({ track: square, path, car: CAR });
+    const hands = { throttle: 0, brake: 0, steer: 0, analog: false };
+    while (session.robot.laps.length < 2 && session.time < 200) tickSession(session, hands);
+    const [first, second] = session.robot.laps;
+    assert.ok(first.time > lap.time && first.time < 1.15 * lap.time, `${first.time} s against ${lap.time} s`);
+    assert.ok(second.time < first.time + 1);
+  });
+
+  it("gives Sami's gap to the ghost at his point", () => {
+    const session = createSession({ track: square, path, car: CAR });
+    for (let k = 0; k < 300; k += 1) tickSession(session, { throttle: 1, brake: 0, steer: 0, analog: false });
+    const { elapsed, gap } = lapGap(session, lap.clock);
+    assert.ok(Math.abs(elapsed - 3) < 1e-9);
+    assert.equal(gap, elapsed - lap.clock[session.player.index]);
   });
 });
