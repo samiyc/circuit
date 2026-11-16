@@ -1,18 +1,20 @@
 import { readFileSync } from "node:fs";
 import { PURSUIT, TUNED } from "../src/drive/pursuit.js";
 import { driveLine } from "../src/drive/run.js";
-import { TRACK_NAMES, readTrack, tracksDownloaded } from "./lib/tracks.js";
+import { TRACK_NAMES, linesOption, readTrack, tracksDownloaded } from "./lib/tracks.js";
 
 /**
  * `npm run drive [-- Piste…]`: the car that slips (J4) driven by the pure-pursuit driver on the lines of
  * `npm run lines` (data/lines/), the best one and the minimum-curvature one, against the profile of that car: the rule
  * set by hand, and the one P7 tuned. A lap is about 15 ms: the 25 tracks take three seconds, beside the queue.
+ * `--bicycle`: the lines searched for that profile (data/lines-bicycle/).
  */
 if (!tracksDownloaded()) {
   console.log("Les pistes manquent : npm run tracks");
   process.exit(1);
 }
-const names = process.argv.slice(2).length ? process.argv.slice(2) : TRACK_NAMES;
+const option = linesOption(process.argv.slice(2));
+const names = option.rest.length ? option.rest : TRACK_NAMES;
 const LINES = { best: "la meilleure", minCurvature: "courbure min." };
 const RULES = { "à la main": PURSUIT, "réglée (P7)": TUNED };
 const gaps = Object.fromEntries(Object.keys(RULES).map((rule) => [rule, { best: [], minCurvature: [] }]));
@@ -39,7 +41,7 @@ console.log("| Piste | Ligne | Point matériel (s) | Profil de la bicyclette (s)
 console.log("|---|---|--:|--:|--:|--:|--:|--:|--:|--:|");
 for (const name of names) {
   const track = readTrack(name);
-  const data = JSON.parse(readFileSync(`data/lines/${name}.json`, "utf8"));
+  const data = JSON.parse(readFileSync(`${option.dir}/${name}.json`, "utf8"));
   for (const entry of Object.entries(LINES)) console.log(row(name, track, data, entry));
 }
 for (const [rule, byLine] of Object.entries(gaps)) {

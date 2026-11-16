@@ -37,3 +37,13 @@ export function readTrack(name) {
 export function readRaceline(name) {
   return parseRaceline(readFileSync(join(TUM_DIR, "racelines", `${name}.csv`), "utf8"));
 }
+
+/**
+ * The lines' folder: data/lines/ for the point mass (`npm run lines`), data/lines-bicycle/ for the profile of the car
+ * that slips (`npm run lines -- --bicycle`, J4), and the arguments left once the option is taken out.
+ * @param {string[]} args
+ */
+export function linesOption(args) {
+  const bicycle = args.includes("--bicycle");
+  return { bicycle, dir: bicycle ? "data/lines-bicycle" : "data/lines", rest: args.filter((arg) => arg !== "--bicycle") };
+}
