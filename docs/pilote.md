@@ -150,6 +150,40 @@ tenir une voiture poussée à la limite. Sur les 25 pistes (`npm run drive`) :
 Le réglé ne s'arrête plus qu'à Oschersleben, au premier virage de la meilleure ligne. Il garde 0,2 à 1,6 s hors piste
 sur la meilleure ligne, et presque rien sur la courbure minimale. C'est le pilote de la page.
 
+### 6 bis. La nuit du 16/11 : l'escalade contre CMA-ES, et les lignes de la bicyclette
+
+Deux questions, 13 jobs de la file (commit 40c5f0c, résultats dans `tmp/p7/`) :
+- **l'escalade suffit-elle ici aussi ?** C'est le cas chez economie (R3, 7 gènes bornés) ;
+- **la ligne cherchée pour la bicyclette est-elle plus rapide** que celle du point matériel ?
+
+Le protocole :
+- `lookMin` va désormais de 1 à 20 m : la graine 1 du 15/11 était à la borne de 3 m.
+- Les deux recherches partent de la règle à la main, avec le même budget de 360 plans.
+- L'escalade de la lib bouge un gène par plan, par un tirage normal de 0,2 × l'amplitude, ramené dans [0, 1].
+
+Les scores sont des moyennes sur 3 graines (entre parenthèses, la pire et la meilleure graine). La règle à la main
+vérifie à 0,117 sur les lignes du point matériel et à 0,119 sur celles de la bicyclette.
+
+| Lignes | Recherche | Entraînement | Vérification |
+|---|---|--:|--:|
+| point matériel | CMA-ES | 0,087 (0,085-0,091) | 0,100 (0,097-0,105) |
+| point matériel | escalade | 0,094 (0,085-0,105) | 0,105 (0,096-0,117) |
+| bicyclette | CMA-ES | 0,091 (0,090-0,094) | 0,098 (0,089-0,104) |
+| bicyclette | escalade | 0,105 (0,092-0,112) | 0,100 (0,088-0,125) |
+
+- **Ici, CMA-ES fait au moins aussi bien que l'escalade**, contrairement aux trois cas du tableau : la ligne, Mars
+  Lander, R3. Il est meilleur à l'entraînement dans les deux cas et plus régulier d'une graine à l'autre. Une graine de
+  l'escalade (bicyclette, graine 2) vérifie moins bien que la règle à la main. Les écarts de vérification restent dans
+  le bruit de 3 graines. Notre lecture : les six réglages sont liés (la marge, le gain et l'anticipation se compensent)
+  et l'optimum est surtout intérieur. Seul `crossGain` reste à sa borne 0, dans 9 réglages sur 12.
+- **L'écart entre l'entraînement et la vérification** (0,01 à 0,03) dit que 12 pistes ne suffisent pas à fixer six
+  réglages au millième. `TUNED` reste celui du 15/11.
+- **Les lignes de la bicyclette** (`npm run lines -- --bicycle`, dans `data/lines-bicycle/`) sont meilleures sur les
+  25 pistes. Au profil de la bicyclette, la meilleure ligne gagne 0,05 à 1,18 s, 0,43 s en moyenne (Spa 1,18 s,
+  Silverstone 1,06 s, Monza 0,25 s). Pilotée par `TUNED`, elle gagne 0,37 s en moyenne sur les 23 pistes où les deux
+  tours finissent. Le pilote réglé y finit 23 tours sur 25 au lieu de 24 : Oschersleben s'arrête toujours, et Sakhir
+  part en tête-à-queue à 48 s.
+
 ## 7. Sami aux commandes : la page Piloter
 
 `web/drive.html` (P9, 15/11) : la voiture de Sami et celle du pilote réglé partent ensemble de la ligne de départ, à la
@@ -179,10 +213,9 @@ pure (`src/drive/input.js`), et la course par `src/drive/session.js`, tous deux 
   le pilote réglé.
 - **P6**, l'escalade sur les entrées pas à pas, après.
 
-**Question pour Sami** : faut-il recalculer les lignes pour la bicyclette, avec son profil au μy de l'avant ? Je le
-recommande : la meilleure ligne actuelle est cherchée pour une voiture qui tourne 4 % plus vite. Le fantôme de la page
-Piloter suit déjà le profil de la bicyclette ; c'est la forme de la ligne qui reste celle du point matériel. Cela coûte
-une nuit de file (25 pistes à 25 s), et la page des lignes changerait de temps.
+**Question pour Sami** : faut-il que la page Piloter prenne les lignes de la bicyclette (`data/lines-bicycle/`, § 6
+bis) ? Je le recommande : elles sont plus rapides sur les 25 pistes, de 0,43 s en moyenne. La page des lignes resterait
+celle du point matériel, qui est le modèle des J1 à J3.
 
 ## Sources
 
