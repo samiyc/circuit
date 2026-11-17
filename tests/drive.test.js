@@ -2,10 +2,11 @@ import { describe, it } from "node:test";
 import assert from "node:assert/strict";
 import { pointMassF1 } from "../src/car.js";
 import { CHASSIS, createBicycle, createCarState, profileCar, stepCar } from "../src/drive/bicycle.js";
-import { createPursuit, gripLeft, nearestPoint, pathOf, pedalFor } from "../src/drive/pursuit.js";
+import { TUNED, createPursuit, gripLeft, nearestPoint, pathOf, pedalFor, pursue } from "../src/drive/pursuit.js";
 import { LATERAL_LIMIT, controlsOf, keyboardInput, lockAt, mergeInputs, padInput } from "../src/drive/input.js";
-import { driveLine, pastEdge, sideOf } from "../src/drive/run.js";
+import { driveLap, driveLine, pastEdge, sideOf, startOf } from "../src/drive/run.js";
 import { createSession, lapGap, tickSession } from "../src/drive/session.js";
+import { PLANNER, createPlanner, plannedControls, scorePlan } from "../src/drive/planner.js";
 import { PL_TYRE, lateralShare, peakSlip } from "../src/drive/tyre.js";
 import { lineBounds } from "../src/line/line.js";
 import { minCurvatureLine } from "../src/line/references.js";
@@ -195,5 +196,28 @@ describe("a drive on the page", () => {
     assert.equal(on.playerCar.assists, true);
     assert.equal(on.car.assists, false);
     assert.equal(createSession({ track: square, path, car: CAR, assists: false }).playerCar.assists, false);
+  });
+});
+
+describe("the driver by search", () => {
+  const square = createTrack(roundedPolygon({ sides: 4, straight: 200, radius: 30, spacing: 4, width: 14 }));
+  const lap = createLap(square, profileCar(CAR), minCurvatureLine(square, lineBounds(square)).offsets);
+  const path = pathOf(lap, square);
+  const settings = { ...PLANNER, budget: 12 };
+  const plannedLap = (seed) => {
+    const planner = createPlanner({ track: square, path, car: CAR }, { settings, seed });
+    return driveLap({ track: square, path, car: CAR, driver: planner.driver, drive: (state) => plannedControls(planner, state) }, { state: startOf(path, TUNED.margin) });
+  };
+
+  it("scores the rule's plan by the metres it gains, and drives a lap no slower than the rule, replayed from its seed", () => {
+    const planner = createPlanner({ track: square, path, car: CAR }, { settings });
+    Object.assign(planner.from.state, startOf(path, TUNED.margin));
+    const gained = scorePlan(planner, new Float64Array(2 * settings.segments));
+    assert.ok(gained > 0.8 * TUNED.margin * path.speed[0] * settings.segments * settings.segment, `${gained} m`);
+    const rule = createPursuit(path, TUNED);
+    const ruled = driveLap({ track: square, path, car: CAR, driver: rule, drive: (state) => pursue(rule, CAR, state) }, { state: startOf(path, TUNED.margin) });
+    const [one, two] = [plannedLap(3), plannedLap(3)];
+    assert.ok(one.finished && one.time <= ruled.time + 0.05, `${one.time} s against ${ruled.time} s`);
+    assert.deepEqual(one, two);
   });
 });
