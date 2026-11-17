@@ -196,6 +196,13 @@ pure (`src/drive/input.js`), et la course par `src/drive/session.js`, tous deux 
   tourner en proportion.
 - **À haute vitesse, la butée se réduit** à ce qui donne 50 m/s² (L·a / u², environ 5 g), comme dans un jeu de course.
   Sans cela, une touche à fond à 300 km/h ferait partir la voiture en tête-à-queue d'un coup.
+- **Les aides** (17/11, T pour les couper), après le retour de Sami (« très difficile à conduire, spin en sortie de
+  virage », au clavier comme à la manette). Une touche est tout ou rien, et plein gaz donnait à l'arrière toute son
+  adhérence longitudinale : l'ellipse de frottement ne laissait plus rien au virage. L'antipatinage et l'ABS
+  (`assisted`, `src/drive/bicycle.js`) bornent la force de chaque essieu à ce que l'ellipse laisse, une fois gardée la
+  force latérale que demande son angle de dérive. La mesure (`tmp/j4/assist.mjs`) prend la direction du pilote réglé et
+  son accélérateur rendu tout ou rien. Sans les aides, il finit 1 tour sur 25 ; avec elles, 21 tours, à 8,0 % du profil.
+  Le pilote réglé y perdrait 1,2 point (de 7,6 à 8,8 %) : il n'en a pas, et ses chiffres ne changent pas.
 - **La vue** : la caméra suit la voiture, son cap vers le haut. Le champ grandit avec la vitesse (2,5 s de route plus
   60 m) pour voir le point de freinage, et une carte du circuit tient dans un coin.
 - **Le panneau** :

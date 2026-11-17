@@ -4,6 +4,17 @@
   "intro": "Une F1 sur les circuits de TU Munich, en simulation : la ligne idéale calculée hors ligne, puis un pilote qui la suit, puis Sami aux commandes, contre lui.",
   "versions": [
     {
+      "version": "0.4.2",
+      "title": "Les aides : antipatinage et ABS",
+      "date": "17/11/2026",
+      "commits": [],
+      "items": [
+        "Sami : « très difficile à conduire, spin en sortie de virage ». Une touche est tout ou rien : plein gaz prenait toute l'adhérence de l'arrière, et plus rien ne tenait le virage.",
+        "Les aides de ta voiture (T pour les couper) : l'accélérateur et le frein ne prennent à chaque essieu que l'adhérence que le virage laisse. Le pilote réglé, à l'accélérateur tout ou rien, finit 21 tours sur 25 avec elles, 1 sans.",
+        "Le pilote de la poursuite pure n'a pas d'aides : ses chiffres ne changent pas."
+      ]
+    },
+    {
       "version": "0.4.1",
       "title": "Piloter sur les lignes de la voiture qui glisse",
       "date": "17/11/2026",

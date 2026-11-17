@@ -47,6 +47,8 @@ export function createBicycle(file = TUM_F1, chassis = CHASSIS, tyre = PL_TYRE) 
     rear: { muX: file.muxRear, muY: file.muyRear },
     loadSensitivity: file.dmuDfz,
     nominalLoad: file.fz0,
+    /** traction control and ABS (`assisted`): Sami's car only, never the drivers measured */
+    assists: false,
   };
 }
 
@@ -73,6 +75,8 @@ export function createCarState({ x, y, heading, speed }) {
 /** The forces of a substep, reused (the step does not allocate). */
 const force = { x: 0, y: 0, yaw: 0 };
 const drive = { front: 0, rear: 0 };
+/** Each axle's slip angle of the substep, rad, for the assists. */
+const slips = { front: 0, rear: 0 };
 
 /**
  * An axle's grip as μ·Fz, each μ shifted by the load of one of its two tyres.
@@ -108,8 +112,24 @@ function lateralForce(car, axle, load, { slip, longitudinal }) {
  */
 function longitudinalForces(car, { u, pedal }, loadFront, loadRear) {
   const braking = pedal < 0;
-  drive.front = braking ? pedal * grip(car, car.front, loadFront, "muX") : 0;
-  drive.rear = pedal * (braking ? grip(car, car.rear, loadRear, "muX") : Math.min(powerAt(car.point, u) / u, grip(car, car.rear, loadRear, "muX")));
+  const front = grip(car, car.front, loadFront, "muX") * assisted(car, slips.front, loadFront);
+  const rear = grip(car, car.rear, loadRear, "muX") * assisted(car, slips.rear, loadRear);
+  drive.front = braking ? pedal * front : 0;
+  drive.rear = pedal * (braking ? rear : Math.min(powerAt(car.point, u) / u, rear));
+}
+
+/**
+ * The share of an axle's longitudinal grip the assists let the pedal take (traction control and ABS, Sami's car only,
+ * docs/pilote.md § 7): what the friction ellipse leaves once the lateral force the axle needs at its slip angle is
+ * kept, so that a full key never takes the grip that holds the corner. All of it without the assists.
+ * @param {Bicycle} car
+ * @param {number} slip rad
+ * @param {number} load N, the axle
+ */
+function assisted(car, slip, load) {
+  if (!car.assists) return 1;
+  const share = Math.min(1, Math.abs(lateralShare(car.tyre, slip, load / 2)));
+  return Math.sqrt(1 - share * share);
 }
 
 /**
@@ -123,9 +143,11 @@ function computeForces(car, state) {
   const transfer = (car.mass * state.ax * car.cogHeight) / car.wheelbase;
   const loadFront = Math.max(0, (weight * car.lr) / car.wheelbase + car.downFront * u * u - transfer);
   const loadRear = Math.max(0, (weight * car.lf) / car.wheelbase + car.downRear * u * u + transfer);
+  slips.front = steer - Math.atan2(v + car.lf * r, u);
+  slips.rear = -Math.atan2(v - car.lr * r, u);
   longitudinalForces(car, state, loadFront, loadRear);
-  const frontY = lateralForce(car, car.front, loadFront, { slip: steer - Math.atan2(v + car.lf * r, u), longitudinal: drive.front });
-  const rearY = lateralForce(car, car.rear, loadRear, { slip: -Math.atan2(v - car.lr * r, u), longitudinal: drive.rear });
+  const frontY = lateralForce(car, car.front, loadFront, { slip: slips.front, longitudinal: drive.front });
+  const rearY = lateralForce(car, car.rear, loadRear, { slip: slips.rear, longitudinal: drive.rear });
   const [cos, sin] = [Math.cos(steer), Math.sin(steer)];
   const frontSide = drive.front * sin + frontY * cos;
   force.x = drive.front * cos - frontY * sin + drive.rear - Math.sign(u) * resistance(car.point, u);

@@ -60,6 +60,20 @@ describe("the car that slips", () => {
     assert.deepEqual(one, two);
   });
 
+  it("spins on a full throttle out of a corner, unless the assists keep the grip the corner needs", () => {
+    const slideAfter = (assists) => {
+      const car = { ...CAR, assists };
+      const state = createCarState({ x: 0, y: 0, heading: 0, speed: 25 });
+      for (let k = 0; k < 100; k += 1) stepCar(car, state, { steer: 0.12, pedal: 0.1 }, 0.01);
+      const speed = state.u;
+      for (let k = 0; k < 150; k += 1) stepCar(car, state, { steer: 0.12, pedal: 1 }, 0.01);
+      return { slip: Math.abs(Math.atan2(state.v, state.u)) / DEGREE, faster: state.u > speed };
+    };
+    assert.ok(slideAfter(false).slip > 45);
+    const held = slideAfter(true);
+    assert.ok(held.slip < 10 && held.faster);
+  });
+
   it("keeps the lock within its limit", () => {
     const state = createCarState({ x: 0, y: 0, heading: 0, speed: 30 });
     for (let k = 0; k < 100; k += 1) stepCar(CAR, state, { steer: 2, pedal: 0 }, 0.01);
@@ -163,5 +177,12 @@ describe("a drive on the page", () => {
     const { elapsed, gap } = lapGap(session, lap.clock);
     assert.ok(Math.abs(elapsed - 3) < 1e-9);
     assert.equal(gap, elapsed - lap.clock[session.player.index]);
+  });
+
+  it("gives Sami's car the assists unless he turns them off, never the driver's", () => {
+    const on = createSession({ track: square, path, car: CAR });
+    assert.equal(on.playerCar.assists, true);
+    assert.equal(on.car.assists, false);
+    assert.equal(createSession({ track: square, path, car: CAR, assists: false }).playerCar.assists, false);
   });
 });

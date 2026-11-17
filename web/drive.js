@@ -18,7 +18,7 @@ const DRIVEN = ["best", "minCurvature"];
 const $ = (id) => document.getElementById(id);
 const els = { track: $("track"), line: $("line"), restart: $("restart"), pause: $("pause"), status: $("status"), road: $("road"), hud: $("hud") };
 const keys = new Set();
-const state = { offsets: null, track: null, lap: null, session: null, paused: false, last: 0, carry: 0, ahead: 150 };
+const state = { offsets: null, track: null, lap: null, session: null, paused: false, assists: true, last: 0, carry: 0, ahead: 150 };
 const decimal = (value, digits = 2) => value.toFixed(digits).replace(".", ",");
 const clock = (seconds) => (Number.isFinite(seconds) ? `${Math.floor(seconds / 60)}:${decimal(seconds % 60, 2).padStart(5, "0")}` : "–");
 
@@ -46,7 +46,7 @@ function restart() {
   const { track } = state;
   const lap = createLap(track, profileCar(CAR), state.offsets[els.line.value]);
   state.lap = lap;
-  state.session = createSession({ track, path: pathOf(lap, track), car: CAR });
+  state.session = createSession({ track, path: pathOf(lap, track), car: CAR, assists: state.assists });
   state.low = Math.min(...lap.profile.speed);
   state.high = Math.max(...lap.profile.speed);
   state.seen = 0;
@@ -101,6 +101,7 @@ function showHud(session) {
     `tour ${clock(elapsed)} · <span class="${gap > 0 ? "loss" : "gain"}">${gap > 0 ? "+" : "−"}${decimal(Math.abs(gap))} s</span> sur le fantôme`,
     `dernier ${lastText} · meilleur ${clock(readBest())}`,
     `le pilote : ${robotLast ? clock(robotLast.time) : "en route"} · le profil : ${clock(state.lap.time)}`,
+    `aides (T) : ${session.playerCar.assists ? "antipatinage et ABS" : "aucune"}`,
     player.off ? `<span class="loss">hors piste</span>` : "",
   ].join("<br>");
 }
@@ -159,6 +160,7 @@ function wire() {
     if (DRIVE_KEYS.has(event.code)) event.preventDefault();
     if (event.code === "KeyR") restart();
     else if (event.code === "Space") state.paused = !state.paused;
+    else if (event.code === "KeyT" && state.session) state.session.playerCar.assists = state.assists = !state.assists;
     keys.add(event.code);
   });
   window.addEventListener("keyup", (event) => keys.delete(event.code));
