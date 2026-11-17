@@ -4,6 +4,18 @@
   "intro": "Une F1 sur les circuits de TU Munich, en simulation : la ligne idéale calculée hors ligne, puis un pilote qui la suit, puis Sami aux commandes, contre lui.",
   "versions": [
     {
+      "version": "0.8.0",
+      "title": "Piloter sous la pluie",
+      "date": "17/11/2026",
+      "commits": [],
+      "items": [
+        "Un menu Météo sur la page Piloter : sec, pluie, ou pluie avec la trajectoire sèche plus glissante. Ta voiture, le pilote et le fantôme roulent sur la même route mouillée.",
+        "Le panneau donne l'adhérence sous ta voiture : 83 % de la sèche sous la pluie, jusqu'à 71 % sur la trajectoire sèche.",
+        "La ligne de pluie de la bicyclette, cherchée pour chaque météo, devient la ligne suivie dès qu'elle est calculée.",
+        "Le meilleur tour se garde par météo."
+      ]
+    },
+    {
       "version": "0.7.0",
       "title": "Les lignes sous la pluie",
       "date": "17/11/2026",

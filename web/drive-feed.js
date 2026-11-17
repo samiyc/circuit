@@ -27,11 +27,11 @@ export function createFeedClient(fail) {
   };
   return {
     /** A new drive: the session to feed, null for the tuned rule (nothing to feed). */
-    start(session, { text, offsets, seed = 1 }) {
+    start(session, { text, offsets, weather = "dry", dry, seed = 1 }) {
       client.id += 1;
       client.session = session;
       client.pending = Boolean(session);
-      if (session) worker().postMessage({ type: "start", id: client.id, text, offsets: [...offsets], seed, ticks: CHUNK });
+      if (session) worker().postMessage({ type: "start", id: client.id, text, offsets: [...offsets], weather, dry: dry ? [...dry] : null, seed, ticks: CHUNK });
     },
     /** Asks for more when the session's buffer runs low. */
     topUp() {

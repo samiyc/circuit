@@ -17,21 +17,23 @@ export const WEATHERS = Object.freeze({ dry: null, wet: 0, band: BAND.drop });
  * The line searched for this weather, as `{ rain }`, or nothing.
  * @param {string} name the track
  * @param {string} weather
+ * @param {string} [root] data/lines-wet/ for the point mass, data/lines-wet-bicycle/ for the car that slips
  * @returns {Promise<Record<string, Float64Array>>}
  */
-export async function rainLines(name, weather) {
+export async function rainLines(name, weather, root = "lines-wet") {
   if (WEATHERS[weather] === null || WEATHERS[weather] === undefined) return {};
-  const lines = await loadLines(name, `lines-wet/${weather}`);
+  const lines = await loadLines(name, `${root}/${weather}`);
   return lines?.best ? { rain: lines.best } : {};
 }
 
 /**
- * The car on this weather's road; its band around the dry line `dry` (the best one).
- * @param {Car} car
+ * The car on this weather's road, the point mass or the car that slips; its band around the dry line `dry` (the best).
+ * @template {Record<string, any>} C
+ * @param {C} car
  * @param {Track} track
  * @param {string} weather
  * @param {Float64Array | undefined} dry
- * @returns {Car}
+ * @returns {C}
  */
 export function carIn(car, track, weather, dry) {
   const drop = WEATHERS[weather] ?? null;

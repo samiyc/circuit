@@ -8,20 +8,23 @@ import { brakingBoards } from "../src/view/boards.js";
 import { createLap, positionAt } from "../src/view/lap.js";
 import { drawChase } from "./drive-chase.js";
 import { createFeedClient } from "./drive-feed.js";
+import { bestKey as keyOf, keepBest as keep, readBest as read, remember } from "./drive-store.js";
 import { drawDrive } from "./drive-view.js";
 import { LINE_NAMES, computeLines, loadLines, loadTrack } from "./load.js";
+import { carIn, rainLines } from "./weather.js";
 
 /**
  * The drive page (J4, P9): Sami's car under his keys or his gamepad, a driver beside him (by search, in a worker, or
- * the tuned rule), the ghost of the line's profile ahead or behind. It loads, wires, reads the hands and draws; the drive is src/drive/session.js.
+ * the tuned rule), the ghost of the line's profile ahead or behind, on a dry or a wet road (P8, web/weather.js). It
+ * loads, wires, reads the hands and draws; the drive is src/drive/session.js.
  */
 const CAR = createBicycle();
-const DRIVEN = ["best", "minCurvature"];
+const DRIVEN = ["rain", "best", "minCurvature"];
 /** @param {string} id @returns {any} */
 const $ = (id) => document.getElementById(id);
-const els = { track: $("track"), line: $("line"), view: $("view"), pad: $("pad"), opponent: $("opponent"), restart: $("restart"), pause: $("pause"), status: $("status"), road: $("road"), hud: $("hud") };
+const els = { weather: $("weather"), track: $("track"), line: $("line"), view: $("view"), pad: $("pad"), opponent: $("opponent"), restart: $("restart"), pause: $("pause"), status: $("status"), road: $("road"), hud: $("hud") };
 const keys = new Set();
-const state = { offsets: null, text: "", track: null, lap: null, session: null, boards: [], paused: false, assists: true, last: 0, carry: 0, ahead: 150, heading: null };
+const state = { dry: null, offsets: null, text: "", track: null, lap: null, session: null, boards: [], paused: false, assists: true, last: 0, carry: 0, ahead: 150, heading: null };
 /** The views (V): from behind the car, or from above, near or far; the metres of road ahead from above at a speed. */
 const VIEWS = { chase: { ahead: (u) => 2.5 * u + 60, chase: true }, near: { ahead: (u) => 1.2 * u + 40 }, far: { ahead: (u) => 2.5 * u + 60 } };
 const decimal = (value, digits = 2) => value.toFixed(digits).replace(".", ",");
@@ -29,51 +32,20 @@ const OPPONENTS = { search: "le pilote par recherche", rule: "le pilote réglé"
 const feed = createFeedClient((message) => (els.status.innerHTML = `<span class="error">le pilote par recherche : ${message}</span>`));
 const clock = (seconds) => (Number.isFinite(seconds) ? `${Math.floor(seconds / 60)}:${decimal(seconds % 60, 2).padStart(5, "0")}` : "–");
 
-/** A choice kept in this browser (a convenience: the default without storage). */
-function remember(select) {
-  try {
-    const kept = localStorage.getItem(`circuit.${select.id}`);
-    if (kept && [...select.options].some((option) => option.value === kept)) select.value = kept;
-  } catch {
-    /* no storage */
-  }
-  select.addEventListener("change", () => {
-    try {
-      localStorage.setItem(`circuit.${select.id}`, select.value);
-    } catch {
-      /* no storage */
-    }
-    els.road.focus();
-  });
-}
-
-/** The best lap kept in this browser, per track and line (a convenience: none without storage). */
-function bestKey() {
-  return `circuit.best.${els.track.value}.${els.line.value}`;
-}
-function readBest() {
-  try {
-    return Number(localStorage.getItem(bestKey())) || Infinity;
-  } catch {
-    return Infinity;
-  }
-}
-function keepBest(time) {
-  try {
-    if (time < readBest()) localStorage.setItem(bestKey(), String(time));
-  } catch {
-    /* no storage: the best lap lasts the page */
-  }
-}
+/** The best clean lap kept in this browser, per track, line and weather. */
+const bestKey = () => keyOf(els.track.value, els.line.value, els.weather.value);
+const readBest = () => read(bestKey());
+const keepBest = (time) => keep(bestKey(), time);
 
 /** A new drive on the chosen line. */
 function restart() {
   const { track } = state;
-  const lap = createLap(track, profileCar(CAR), state.offsets[els.line.value]);
+  const [weather, dry] = [els.weather.value, state.dry.best];
+  const lap = createLap(track, carIn(profileCar(CAR), track, weather, dry), state.offsets[els.line.value]);
   state.lap = lap;
   const fed = els.opponent.value === "search";
-  state.session = createSession({ track, path: pathOf(lap, track), car: CAR, assists: state.assists, fed });
-  feed.start(fed ? state.session : null, { text: state.text, offsets: state.offsets[els.line.value] });
+  state.session = createSession({ track, path: pathOf(lap, track), car: carIn(CAR, track, weather, dry), assists: state.assists, fed });
+  feed.start(fed ? state.session : null, { text: state.text, offsets: state.offsets[els.line.value], weather, dry });
   state.boards = brakingBoards(track, lap);
   state.heading = null;
   state.low = Math.min(...lap.profile.speed);
@@ -89,14 +61,21 @@ async function selectTrack(name) {
     const { track, text } = await loadTrack(name);
     state.track = track;
     state.text = text;
-    state.offsets = (await loadLines(name, "lines-bicycle")) ?? (await loadLines(name)) ?? (await computeLines(text, "references"));
-    const chosen = els.line.value;
-    els.line.replaceChildren(...DRIVEN.filter((key) => state.offsets[key]).map((key) => new Option(LINE_NAMES[key], key)));
-    if (state.offsets[chosen]) els.line.value = chosen;
-    restart();
+    state.dry = (await loadLines(name, "lines-bicycle")) ?? (await loadLines(name)) ?? (await computeLines(text, "references"));
+    await applyWeather();
   } catch (error) {
     els.status.innerHTML = `<span class="error">${error.message}</span>`;
   }
+}
+
+/** The lines on the weather's road: the dry ones and, in the rain, the rain line searched for this car if it is there. */
+async function applyWeather() {
+  const rain = await rainLines(els.track.value, els.weather.value, "lines-wet-bicycle");
+  state.offsets = { ...state.dry, ...rain };
+  const chosen = rain.rain ? "rain" : els.line.value;
+  els.line.replaceChildren(...DRIVEN.filter((key) => state.offsets[key]).map((key) => new Option(LINE_NAMES[key], key)));
+  if (state.offsets[chosen]) els.line.value = chosen;
+  restart();
 }
 
 /** The hands: the keys held and the first gamepad. */
@@ -115,6 +94,11 @@ function lapText(lap) {
   return clock(lap.time) + off;
 }
 
+/** The grip under Sami's car, in the rain. */
+function gripText({ car, player }) {
+  return car.surface ? " · adhérence " + decimal(100 * player.state.grip, 0) + " %" : "";
+}
+
 /** The panel over the road: speed, lap, gaps, laps closed. */
 function showHud(session) {
   const { player, robot } = session;
@@ -131,7 +115,7 @@ function showHud(session) {
     `tour ${clock(elapsed)} · <span class="${gap > 0 ? "loss" : "gain"}">${gap > 0 ? "+" : "−"}${decimal(Math.abs(gap))} s</span> sur le fantôme`,
     `dernier ${lastText} · meilleur ${clock(readBest())}`,
     `${OPPONENTS[els.opponent.value]} : ${robotLast ? clock(robotLast.time) : "en route"} · le profil : ${clock(state.lap.time)}`,
-    `aides (T) : ${session.playerCar.assists ? "antipatinage et ABS" : "aucune"}`,
+    `aides (T) : ${session.playerCar.assists ? "antipatinage et ABS" : "aucune"}${gripText(session)}`,
     player.off ? `<span class="loss">hors piste</span>` : "",
   ].join("<br>");
 }
@@ -195,8 +179,9 @@ function wire() {
     selectTrack(els.track.value);
   });
   els.line.addEventListener("change", restart);
-  for (const select of [els.view, els.pad, els.opponent]) remember(select);
+  for (const select of [els.view, els.pad, els.opponent, els.weather]) remember(select, () => els.road.focus());
   els.opponent.addEventListener("change", restart);
+  els.weather.addEventListener("change", () => state.dry && applyWeather());
   els.restart.addEventListener("click", restart);
   els.pause.addEventListener("click", () => (state.paused = !state.paused));
   window.addEventListener("keydown", (event) => {

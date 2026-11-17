@@ -19,6 +19,7 @@
     <main>
       <section class="controls">
         <label>Circuit<select id="track"></select></label>
+        <label>Météo<select id="weather"><option value="dry">sec</option><option value="wet">pluie</option><option value="band">pluie, la trajectoire sèche glissante</option></select></label>
         <label>Ligne suivie<select id="line"></select></label>
         <label>Adversaire<select id="opponent"><option value="search">le pilote par recherche</option><option value="rule">le pilote réglé</option></select></label>
         <label>Vue (V)<select id="view"><option value="chase">derrière la voiture</option><option value="near">de dessus, proche</option><option value="far">de dessus, loin</option></select></label>
@@ -37,6 +38,7 @@
         Les panneaux blancs au bord de la piste annoncent le freinage : trois bandes à 150 m, deux à 100 m, une à 50 m.
         Ta voiture est rouge ; la claire est ton adversaire : le pilote par recherche (la règle corrigée par une recherche sur les 2,5 s à venir, 2 s plus rapide au tour), ou le pilote réglé (la poursuite pure seule) ; la blanche, transparente, est le fantôme du profil de vitesse de la ligne, le temps que la voiture pourrait faire.
         L'écart se lit au même point du tour : positif, tu es derrière.
+        La météo : sous la pluie, l'adhérence tombe à 83 % de la sèche (un tour à 111 % du tour sec, la règle de Pirelli pour les intermédiaires) ; la trajectoire sèche peut glisser davantage, 15 % de moins sur 1,5 m de part et d'autre (une hypothèse). Le panneau donne l'adhérence sous ta voiture. La ligne de pluie est cherchée pour chaque météo.
         Les aides (T pour les couper) : l'antipatinage et l'ABS ne laissent l'accélérateur et le frein prendre que l'adhérence que le virage n'utilise pas ; sans elles, plein gaz en sortie de virage, l'arrière décroche.
       </p>
     </main>
