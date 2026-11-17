@@ -142,6 +142,17 @@ describe("Sami's hands", () => {
     assert.equal(mergeInputs(keyboardInput(new Set()), pad).brake, 0.4);
   });
 
+  it("doses the throttle on RT and the brake on LT in the racing games' layout", () => {
+    const button = (value) => ({ pressed: value > 0.5, value });
+    const buttons = Array.from({ length: 8 }, () => button(0));
+    buttons[7] = button(0.3);
+    buttons[6] = button(0.2);
+    const pad = padInput({ buttons, axes: [0, 0] }, "triggers");
+    assert.equal(pad.throttle, 0.3);
+    assert.equal(pad.brake, 0.2);
+    assert.equal(padInput({ buttons, axes: [0, 0] }).throttle, 0);
+  });
+
   it("brings a key's steering to the lock in a quarter of a second, the brake winning over the throttle", () => {
     let share = 0;
     for (let k = 0; k < 10; k += 1) share = controlsOf({ throttle: 1, brake: 0, steer: 1, analog: false }, share, { car: CAR, speed: 10, dt: 0.01 }).share;

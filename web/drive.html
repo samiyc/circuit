@@ -20,6 +20,8 @@
       <section class="controls">
         <label>Circuit<select id="track"></select></label>
         <label>Ligne suivie<select id="line"></select></label>
+        <label>Vue (V)<select id="view"><option value="chase">derrière la voiture</option><option value="near">de dessus, proche</option><option value="far">de dessus, loin</option></select></label>
+        <label>Manette<select id="pad"><option value="sami">A gaz, RB ou RT frein</option><option value="triggers">RT gaz dosé, LT frein dosé</option></select></label>
         <button type="button" id="restart">Recommencer (R)</button>
         <button type="button" class="quiet" id="pause">Pause (Espace)</button>
       </section>
@@ -30,7 +32,8 @@
       </div>
       <p class="hint">
         <strong>Commandes.</strong> Clavier : flèche haut pour accélérer, Ctrl gauche (ou flèche bas) pour freiner, flèches gauche et droite pour tourner.
-        Manette : A pour accélérer, RB pour freiner, la gâchette RT pour freiner en dosant, le stick gauche pour tourner.
+        Manette : A pour accélérer, RB pour freiner, la gâchette RT pour freiner en dosant, le stick gauche pour tourner ; ou, au choix, RT pour accélérer en dosant et LT pour freiner en dosant, comme dans les jeux de course.
+        Les panneaux blancs au bord de la piste annoncent le freinage : trois bandes à 150 m, deux à 100 m, une à 50 m.
         Ta voiture est rouge ; la claire est le pilote de la poursuite pure ; la blanche, transparente, est le fantôme du profil de vitesse de la ligne, le temps que la voiture pourrait faire.
         L'écart se lit au même point du tour : positif, tu es derrière.
         Les aides (T pour les couper) : l'antipatinage et l'ABS ne laissent l'accélérateur et le frein prendre que l'adhérence que le virage n'utilise pas ; sans elles, plein gaz en sortie de virage, l'arrière décroche.

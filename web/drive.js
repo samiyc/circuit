@@ -4,7 +4,9 @@ import { pathOf } from "../src/drive/pursuit.js";
 import { TICK } from "../src/drive/run.js";
 import { createSession, lapGap, tickSession } from "../src/drive/session.js";
 import { TRACK_NAMES } from "../src/track/names.js";
+import { brakingBoards } from "../src/view/boards.js";
 import { createLap, positionAt } from "../src/view/lap.js";
+import { drawChase } from "./drive-chase.js";
 import { drawDrive } from "./drive-view.js";
 import { LINE_NAMES, computeLines, loadLines, loadTrack } from "./load.js";
 
@@ -16,11 +18,31 @@ const CAR = createBicycle();
 const DRIVEN = ["best", "minCurvature"];
 /** @param {string} id @returns {any} */
 const $ = (id) => document.getElementById(id);
-const els = { track: $("track"), line: $("line"), restart: $("restart"), pause: $("pause"), status: $("status"), road: $("road"), hud: $("hud") };
+const els = { track: $("track"), line: $("line"), view: $("view"), pad: $("pad"), restart: $("restart"), pause: $("pause"), status: $("status"), road: $("road"), hud: $("hud") };
 const keys = new Set();
-const state = { offsets: null, track: null, lap: null, session: null, paused: false, assists: true, last: 0, carry: 0, ahead: 150 };
+const state = { offsets: null, track: null, lap: null, session: null, boards: [], paused: false, assists: true, last: 0, carry: 0, ahead: 150, heading: null };
+/** The views (V): from behind the car, or from above, near or far; the metres of road ahead from above at a speed. */
+const VIEWS = { chase: { ahead: (u) => 2.5 * u + 60, chase: true }, near: { ahead: (u) => 1.2 * u + 40 }, far: { ahead: (u) => 2.5 * u + 60 } };
 const decimal = (value, digits = 2) => value.toFixed(digits).replace(".", ",");
 const clock = (seconds) => (Number.isFinite(seconds) ? `${Math.floor(seconds / 60)}:${decimal(seconds % 60, 2).padStart(5, "0")}` : "–");
+
+/** A choice kept in this browser (a convenience: the default without storage). */
+function remember(select) {
+  try {
+    const kept = localStorage.getItem(`circuit.${select.id}`);
+    if (kept && [...select.options].some((option) => option.value === kept)) select.value = kept;
+  } catch {
+    /* no storage */
+  }
+  select.addEventListener("change", () => {
+    try {
+      localStorage.setItem(`circuit.${select.id}`, select.value);
+    } catch {
+      /* no storage */
+    }
+    els.road.focus();
+  });
+}
 
 /** The best lap kept in this browser, per track and line (a convenience: none without storage). */
 function bestKey() {
@@ -47,6 +69,8 @@ function restart() {
   const lap = createLap(track, profileCar(CAR), state.offsets[els.line.value]);
   state.lap = lap;
   state.session = createSession({ track, path: pathOf(lap, track), car: CAR, assists: state.assists });
+  state.boards = brakingBoards(track, lap);
+  state.heading = null;
   state.low = Math.min(...lap.profile.speed);
   state.high = Math.max(...lap.profile.speed);
   state.seen = 0;
@@ -72,7 +96,7 @@ async function selectTrack(name) {
 /** The hands: the keys held and the first gamepad. */
 function hands() {
   const pad = [...(navigator.getGamepads?.() ?? [])].find(Boolean) ?? null;
-  return mergeInputs(keyboardInput(keys), padInput(pad));
+  return mergeInputs(keyboardInput(keys), padInput(pad, els.pad.value));
 }
 
 /** The pose of a car state, for the drawing. */
@@ -117,13 +141,24 @@ function sized(canvas) {
   return { ctx, width, height };
 }
 
+/** The camera's heading, a fifth of the way towards the car's each frame: a slide shows from behind. */
+function cameraHeading(heading) {
+  const from = state.heading ?? heading;
+  state.heading = from + 0.2 * Math.atan2(Math.sin(heading - from), Math.cos(heading - from));
+  return state.heading;
+}
+
 function draw() {
   const { session, lap } = state;
   const { player, robot } = session;
-  state.ahead += (2.5 * player.state.u + 60 - state.ahead) * 0.05;
+  const view = VIEWS[els.view.value] ?? VIEWS.chase;
+  state.ahead += (view.ahead(player.state.u) - state.ahead) * 0.05;
   const ghost = positionAt(lap, session.time - player.lapStart);
   const { ctx, width, height } = sized(els.road);
-  drawDrive(ctx, { track: state.track, line: lap, low: state.low, high: state.high, player: poseOf(player.state), robot: poseOf(robot.state), ghost, ahead: state.ahead, width, height });
+  const scene = { track: state.track, line: lap, low: state.low, high: state.high, player: poseOf(player.state), robot: poseOf(robot.state), ghost, boards: state.boards, ahead: state.ahead, width, height };
+  const camera = { x: player.state.x, y: player.state.y, heading: cameraHeading(player.state.heading) };
+  if (view.chase) drawChase(ctx, { ...scene, camera, index: player.index });
+  else drawDrive(ctx, scene);
   showHud(session);
 }
 
@@ -153,6 +188,7 @@ function wire() {
     selectTrack(els.track.value);
   });
   els.line.addEventListener("change", restart);
+  for (const select of [els.view, els.pad]) remember(select);
   els.restart.addEventListener("click", restart);
   els.pause.addEventListener("click", () => (state.paused = !state.paused));
   window.addEventListener("keydown", (event) => {
@@ -161,6 +197,7 @@ function wire() {
     if (event.code === "KeyR") restart();
     else if (event.code === "Space") state.paused = !state.paused;
     else if (event.code === "KeyT" && state.session) state.session.playerCar.assists = state.assists = !state.assists;
+    else if (event.code === "KeyV") els.view.selectedIndex = (els.view.selectedIndex + 1) % els.view.options.length;
     keys.add(event.code);
   });
   window.addEventListener("keyup", (event) => keys.delete(event.code));

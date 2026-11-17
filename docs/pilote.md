@@ -203,7 +203,15 @@ pure (`src/drive/input.js`), et la course par `src/drive/session.js`, tous deux 
   force latérale que demande son angle de dérive. La mesure (`tmp/j4/assist.mjs`) prend la direction du pilote réglé et
   son accélérateur rendu tout ou rien. Sans les aides, il finit 1 tour sur 25 ; avec elles, 21 tours, à 8,0 % du profil.
   Le pilote réglé y perdrait 1,2 point (de 7,6 à 8,8 %) : il n'en a pas, et ses chiffres ne changent pas.
-- **La vue** : la caméra suit la voiture, son cap vers le haut. Le champ grandit avec la vitesse (2,5 s de route plus
+- **Les vues** (17/11, V pour changer) : derrière la voiture (`src/view/chase.js`, une caméra à 9 m derrière et 3,2 m
+  de haut, la route jusqu'à 450 m, le cap suivi avec un retard pour qu'une glissade se voie), de dessus proche
+  (1,2 s de route plus 40 m), ou de dessus loin comme avant.
+- **Les panneaux de freinage** (`src/view/boards.js`) : à 150, 100 et 50 m de chaque point où le profil commence un
+  freinage de 8 m/s ou plus, du côté où la ligne n'est pas. Trois, deux puis une bande, comme sur les vrais circuits
+  (questions.md § 4, question 1).
+- **La manette au choix** : la disposition de Sami, ou celle des jeux de course (RT gaz dosé, LT frein dosé), pour
+  doser l'accélérateur que le bouton A donne tout ou rien.
+- **La vue de dessus** (la première) : la caméra suit la voiture, son cap vers le haut. Le champ grandit avec la vitesse (2,5 s de route plus
   60 m) pour voir le point de freinage, et une carte du circuit tient dans un coin.
 - **Le panneau** :
   - la vitesse ;

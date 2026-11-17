@@ -4,6 +4,18 @@
   "intro": "Une F1 sur les circuits de TU Munich, en simulation : la ligne idéale calculée hors ligne, puis un pilote qui la suit, puis Sami aux commandes, contre lui.",
   "versions": [
     {
+      "version": "0.5.0",
+      "title": "Piloter : la vue de derrière, les panneaux de freinage, les gâchettes dosées",
+      "date": "17/11/2026",
+      "commits": [],
+      "items": [
+        "La vue de derrière la voiture (V pour changer de vue) : la route jusqu'à 450 m, la ligne aux couleurs de sa vitesse, le pilote et le fantôme devant ou derrière. La caméra suit le cap avec un léger retard : une glissade se voit.",
+        "La vue de dessus, proche (environ 140 m de route à 290 km/h au lieu de 500 m), ou loin comme avant.",
+        "Les panneaux de freinage au bord de la piste, à 150, 100 et 50 m de chaque freinage du profil (trois, deux puis une bande), du côté où la ligne n'est pas.",
+        "La manette au choix : la disposition de Sami (A gaz, RB ou RT frein), ou celle des jeux de course, RT pour accélérer en dosant et LT pour freiner en dosant."
+      ]
+    },
+    {
       "version": "0.4.2",
       "title": "Les aides : antipatinage et ABS",
       "date": "17/11/2026",

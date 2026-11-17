@@ -8,7 +8,8 @@ import { boxOf, fitFrame, project } from "../src/view/frame.js";
  * @typedef {import("../src/types.js").Track} Track
  * @typedef {import("../src/view/lap.js").Lap} Lap
  * @typedef {{ x: number, y: number, heading: number }} Pose
- * @typedef {{ track: Track, line: Lap, low: number, high: number, player: Pose, robot: Pose, ghost: Pose, ahead: number, width: number, height: number }} DriveScene
+ * @typedef {import("../src/view/boards.js").Board} Board
+ * @typedef {{ track: Track, line: Lap, low: number, high: number, player: Pose, robot: Pose, ghost: Pose, boards: Board[], ahead: number, width: number, height: number }} DriveScene
  */
 
 const GRASS = "#9bab6e";
@@ -54,6 +55,18 @@ function line(ctx, { line: lap, low, high }) {
     ctx.lineTo(lap.x[(i + 1) % n], lap.y[(i + 1) % n]);
     ctx.strokeStyle = speedColour(lap.profile.speed[i], low, high);
     ctx.stroke();
+  }
+}
+
+/** The braking boards on the verge, seen from above: a white square, a dark bar per 50 m. */
+function boards(ctx, { track, boards: all }) {
+  for (const { index, distance, side } of all) {
+    const w = side > 0 ? track.wLeft[index] + 3 : -(track.wRight[index] + 3);
+    const [x, y] = [track.x[index] + track.nx[index] * w, track.y[index] + track.ny[index] * w];
+    ctx.fillStyle = EDGE;
+    ctx.fillRect(x - 1.5, y - 1.5, 3, 3);
+    ctx.fillStyle = ROBOT;
+    for (let s = 0; s < distance / 50; s += 1) ctx.fillRect(x - 1.2, y - 1.2 + s, 2.4, 0.5);
   }
 }
 
@@ -111,6 +124,7 @@ export function drawDrive(ctx, scene) {
   ctx.translate(-player.x, -player.y);
   asphalt(ctx, scene.track, 1 / zoom);
   start(ctx, scene.track);
+  boards(ctx, scene);
   line(ctx, scene);
   car(ctx, scene.ghost, GHOST, 1 / zoom);
   car(ctx, scene.robot, "#e8e8cd", 1 / zoom);
