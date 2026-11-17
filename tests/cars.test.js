@@ -32,7 +32,7 @@ describe("the cars", () => {
     assert.ok(time(fe) > 1.1 * time(f1), `${time(fe)} s against ${time(f1)} s`);
   });
 
-  for (const [key, over] of [["fe", 1.1], ["rally", 1.3]]) {
+  for (const [key, over] of [["fe", 1.25], ["rally", 1.7]]) {
     it(`drives the ${key} bicycle round a lap cleanly under its rule, within ${over} of its profile`, () => {
       const square = createTrack(roundedPolygon({ sides: 4, straight: 200, radius: 30, spacing: 4, width: 14 }));
       const settings = carOf(key).rule;

@@ -51,11 +51,17 @@ export const RALLY2 = Object.freeze({
  */
 export const RALLY2_CHASSIS = Object.freeze({ ...CHASSIS, yawInertia: 1940, cogHeight: 0.45 });
 
+/**
+ * P7 for each car (docs/voitures.md): CMA-ES on its bicycle lines of even rank, seed 1, rounded. The Formula E's with
+ * the margin from 0.7 (`marginLow=0.7`): 50 laps of 50, 18 % over the profile; the Rally2's from 0.6: 21 of 50, 53 %.
+ */
+export const TUNED_FE = Object.freeze({ lookTime: 0.1, lookMin: 6.6, margin: 0.86, gain: 0.15, anticipation: 0.8, crossGain: 0 });
+export const TUNED_RALLY = Object.freeze({ lookTime: 0.54, lookMin: 20, margin: 0.65, gain: 0.5, anticipation: 0.29, crossGain: 0 });
+
 export const CARS = Object.freeze({
   f1: { name: "F1", file: TUM_F1, chassis: CHASSIS, rule: TUNED },
-  fe: { name: "Formule E", file: TUM_FE, chassis: FE_CHASSIS, rule: TUNED },
-  /** its rule set by hand on the tests' square until P7 tunes it: the F1's spins it (docs/voitures.md § 5) */
-  rally: { name: "Rally2 sur la terre", file: RALLY2, chassis: RALLY2_CHASSIS, rule: Object.freeze({ ...TUNED, margin: 0.8 }) },
+  fe: { name: "Formule E", file: TUM_FE, chassis: FE_CHASSIS, rule: TUNED_FE },
+  rally: { name: "Rally2 sur la terre", file: RALLY2, chassis: RALLY2_CHASSIS, rule: TUNED_RALLY },
 });
 
 /** @param {string} key @returns {(typeof CARS)[CarKey]} */
