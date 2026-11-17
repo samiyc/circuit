@@ -4,6 +4,17 @@
   "intro": "Une F1 sur les circuits de TU Munich, en simulation : la ligne idéale calculée hors ligne, puis un pilote qui la suit, puis Sami aux commandes, contre lui.",
   "versions": [
     {
+      "version": "0.9.0",
+      "title": "La Formule E",
+      "date": "17/11/2026",
+      "commits": [],
+      "items": [
+        "Un menu Voiture sur la page Piloter : la F1 ou la Formule E de TU Munich (880 kg, 200 kW, moins d'appui). Ta voiture, le pilote et le fantôme changent ensemble.",
+        "Les lignes de la Formule E, cherchées pour elle, au sec et sous la pluie : la sienne fait gagner 4 s par tour sur celle de la F1, sur les 25 pistes.",
+        "Le meilleur tour se garde par voiture."
+      ]
+    },
+    {
       "version": "0.8.0",
       "title": "Piloter sous la pluie",
       "date": "17/11/2026",

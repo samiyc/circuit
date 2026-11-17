@@ -20,6 +20,7 @@ mesure. Une piste qui ne tranche rien n'est pas lancée. Rédigé le 13/11/2026,
 | P10 | Plusieurs voitures, en fantômes (sans collision) | plus tard | une course à plusieurs, sans contact | – |
 | P11 | La ligne et le réglage ensemble | plus tard | le résultat de Perantoni et Limebeer, sans gradients | `cmaes` |
 | P12 | L'auto-jeu, une valeur apprise | bien plus tard | ce que fait Linesight, à notre échelle | – |
+| P13 | D'autres voitures réelles : Formule E, rallye, GT3, drift | J5 | la ligne change-t-elle avec la voiture ? | `cmaes`, `climb` |
 
 ## P1. Le profil de vitesse et trois lignes de référence (J1)
 
@@ -158,3 +159,11 @@ propre à chaque piste fait gagner du temps. Avec CMA-ES, il suffit d'ajouter qu
 Linesight a battu dix records du monde sur douze par renforcement, au prix de centaines d'heures et d'un GPU. À
 notre échelle : une valeur apprise pour couper le faisceau du pilote, comme raquette le prévoit. Seulement après
 un pilote par recherche qui marche.
+
+## P13. D'autres voitures (J5)
+
+À la place de P8 bis (Sami, 17/11) : d'autres voitures réelles, d'après les données publiques
+([voitures.md](voitures.md)). **Mesuré le 17/11 pour la Formule E** ([../voitures.md](../voitures.md)) : sa ligne
+gagne 4,1 s sur celle de la F1, 25/25 ; elle aborde les virages de plus loin et en ressort plus large. La règle
+réglée pour la F1 ne tient pas sa meilleure ligne, le pilote par recherche si (48 tours sur 50). Ensuite : le rallye
+sur la terre, puis la GT3, puis le drift.

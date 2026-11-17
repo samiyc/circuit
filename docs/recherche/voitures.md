@@ -8,6 +8,10 @@ La question reste celle de P2 et P8 : **la ligne et le pilotage changent-ils ave
 disent ?** Une Formule E sans appui freine tôt et garde sa vitesse ; une GT lourde prend les virages en V ; une
 voiture de rallye sur la terre tourne en glissant.
 
+**Décidé avec Sami le 17/11, au soir** (« ok pour les pistes 1 à 3 ») : la Formule E d'abord, avec un menu Voiture
+sur la page Piloter ; puis le rallye sur la terre, avant la GT3 ; le drift en dernier, quand le modèle du pneu tiendra
+les grands angles. **La Formule E est mesurée** : [../voitures.md](../voitures.md).
+
 ## 1. Ce qu'on sait de chaque voiture
 
 | Voiture | Masse | Puissance | Transmission | Appui, adhérence | La source | Qualité |
@@ -38,7 +42,7 @@ l'article de 2024 n'en publie aucun.
   un angle de dérive fixe (−40° sur un cercle de 15 m). Il faudrait un autre objectif que le temps au tour : c'est une
   question pour Sami (§ 3).
 
-## 3. Le plan proposé
+## 3. Le plan (l'ordre décidé le 17/11 : 1, 3, 2, 4)
 
 1. **La Formule E**, sans hypothèse : la ligne cherchée, le pilote réglé et le pilote par recherche sur les 25 pistes,
    comparés à la F1. Est-ce que la ligne change avec moins d'appui et moins de puissance ? Elle doit aussi être

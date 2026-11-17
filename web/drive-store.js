@@ -26,13 +26,15 @@ export function remember(select, after) {
 }
 
 /**
- * The best lap's key: the dry road keeps the key of the laps driven before the rain (0.8.0).
+ * The best lap's key: the dry road keeps the key of the laps driven before the rain (0.8.0), the F1 the key of the laps
+ * driven before the other cars (0.9.0).
  * @param {string} track
  * @param {string} line
  * @param {string} weather
+ * @param {string} [car]
  */
-export function bestKey(track, line, weather) {
-  const base = `circuit.best.${track}.${line}`;
+export function bestKey(track, line, weather, car = "f1") {
+  const base = `circuit.best.${track}.${line}${car === "f1" ? "" : "." + car}`;
   return weather === "dry" ? base : `${base}.${weather}`;
 }
 

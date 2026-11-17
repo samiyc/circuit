@@ -87,6 +87,10 @@ Its line in the roadmap: `mcts-commun/docs/feuille-de-route.md`, § 2.C. Start t
   `scripts/p8-summary.js` reads it: 1.30 s gained on the wet road, 6.52 s with the band, the line off it at the apex.
   The car that slips gets the road's grip under it each tick (`roadGrip`); both pages have a weather menu, the drive
   page on the bicycle's rain lines (`--bicycle`, `data/lines-wet-bicycle/`).
+- **Other cars** (P13, `docs/voitures.md`, `src/cars.js`): the Formula E of TUM's `FE_Berlin.ini` beside the F1;
+  `--car=fe` on `lines.js` and `p8.js` (`car=fe` on `p7-planner.js`) puts its lines in `data/lines-fe/`,
+  `data/lines-bicycle-fe/`; `scripts/cars-summary.js` compares: its line gains 4.1 s on the F1's, 25/25. The drive
+  page has a car menu. Next, decided with Sami: rally on gravel, then GT3, drift last.
 
 ## The page
 

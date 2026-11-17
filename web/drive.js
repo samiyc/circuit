@@ -1,4 +1,5 @@
-import { createBicycle, profileCar } from "../src/drive/bicycle.js";
+import { bicycleOf, linesDir } from "../src/cars.js";
+import { profileCar } from "../src/drive/bicycle.js";
 import { keyboardInput, mergeInputs, padInput } from "../src/drive/input.js";
 import { pathOf } from "../src/drive/pursuit.js";
 import { TICK } from "../src/drive/run.js";
@@ -15,16 +16,16 @@ import { carIn, rainLines } from "./weather.js";
 
 /**
  * The drive page (J4, P9): Sami's car under his keys or his gamepad, a driver beside him (by search, in a worker, or
- * the tuned rule), the ghost of the line's profile ahead or behind, on a dry or a wet road (P8, web/weather.js). It
- * loads, wires, reads the hands and draws; the drive is src/drive/session.js.
+ * the tuned rule), the ghost of the line's profile ahead or behind, on a dry or a wet road (P8, web/weather.js), in
+ * the F1 or the Formula E (src/cars.js, docs/voitures.md). It loads, wires, reads the hands and draws; the drive is
+ * src/drive/session.js.
  */
-const CAR = createBicycle();
 const DRIVEN = ["rain", "best", "minCurvature"];
 /** @param {string} id @returns {any} */
 const $ = (id) => document.getElementById(id);
-const els = { weather: $("weather"), track: $("track"), line: $("line"), view: $("view"), pad: $("pad"), opponent: $("opponent"), restart: $("restart"), pause: $("pause"), status: $("status"), road: $("road"), hud: $("hud") };
+const els = { car: $("car"), weather: $("weather"), track: $("track"), line: $("line"), view: $("view"), pad: $("pad"), opponent: $("opponent"), restart: $("restart"), pause: $("pause"), status: $("status"), road: $("road"), hud: $("hud") };
 const keys = new Set();
-const state = { dry: null, offsets: null, text: "", track: null, lap: null, session: null, boards: [], paused: false, assists: true, last: 0, carry: 0, ahead: 150, heading: null };
+const state = { car: bicycleOf("f1"), own: true, dry: null, offsets: null, text: "", track: null, lap: null, session: null, boards: [], paused: false, assists: true, last: 0, carry: 0, ahead: 150, heading: null };
 /** The views (V): from behind the car, or from above, near or far; the metres of road ahead from above at a speed. */
 const VIEWS = { chase: { ahead: (u) => 2.5 * u + 60, chase: true }, near: { ahead: (u) => 1.2 * u + 40 }, far: { ahead: (u) => 2.5 * u + 60 } };
 const decimal = (value, digits = 2) => value.toFixed(digits).replace(".", ",");
@@ -33,7 +34,7 @@ const feed = createFeedClient((message) => (els.status.innerHTML = `<span class=
 const clock = (seconds) => (Number.isFinite(seconds) ? `${Math.floor(seconds / 60)}:${decimal(seconds % 60, 2).padStart(5, "0")}` : "–");
 
 /** The best clean lap kept in this browser, per track, line and weather. */
-const bestKey = () => keyOf(els.track.value, els.line.value, els.weather.value);
+const bestKey = () => keyOf(els.track.value, els.line.value, els.weather.value, els.car.value);
 const readBest = () => read(bestKey());
 const keepBest = (time) => keep(bestKey(), time);
 
@@ -41,17 +42,18 @@ const keepBest = (time) => keep(bestKey(), time);
 function restart() {
   const { track } = state;
   const [weather, dry] = [els.weather.value, state.dry.best];
-  const lap = createLap(track, carIn(profileCar(CAR), track, weather, dry), state.offsets[els.line.value]);
+  const lap = createLap(track, carIn(profileCar(state.car), track, weather, dry), state.offsets[els.line.value]);
   state.lap = lap;
   const fed = els.opponent.value === "search";
-  state.session = createSession({ track, path: pathOf(lap, track), car: carIn(CAR, track, weather, dry), assists: state.assists, fed });
-  feed.start(fed ? state.session : null, { text: state.text, offsets: state.offsets[els.line.value], weather, dry });
+  state.session = createSession({ track, path: pathOf(lap, track), car: carIn(state.car, track, weather, dry), assists: state.assists, fed });
+  feed.start(fed ? state.session : null, { car: els.car.value, text: state.text, offsets: state.offsets[els.line.value], weather, dry });
   state.boards = brakingBoards(track, lap);
   state.heading = null;
   state.low = Math.min(...lap.profile.speed);
   state.high = Math.max(...lap.profile.speed);
   state.seen = 0;
-  els.status.textContent = `${els.track.value} : le profil de la ligne fait ${decimal(lap.time)} s avec cette voiture. Accélère !`;
+  const borrowed = state.own ? "" : " (ligne cherchée pour la F1 : npm run lines -- --bicycle --car=" + els.car.value + ")";
+  els.status.textContent = `${els.track.value} : le profil de la ligne fait ${decimal(lap.time)} s avec cette voiture${borrowed}. Accélère !`;
   els.road.focus();
 }
 
@@ -61,7 +63,10 @@ async function selectTrack(name) {
     const { track, text } = await loadTrack(name);
     state.track = track;
     state.text = text;
-    state.dry = (await loadLines(name, "lines-bicycle")) ?? (await loadLines(name)) ?? (await computeLines(text, "references"));
+    state.car = bicycleOf(els.car.value);
+    const own = await loadLines(name, linesDir("lines-bicycle", els.car.value));
+    state.own = Boolean(own);
+    state.dry = own ?? (await loadLines(name, "lines-bicycle")) ?? (await loadLines(name)) ?? (await computeLines(text, "references"));
     await applyWeather();
   } catch (error) {
     els.status.innerHTML = `<span class="error">${error.message}</span>`;
@@ -70,7 +75,7 @@ async function selectTrack(name) {
 
 /** The lines on the weather's road: the dry ones and, in the rain, the rain line searched for this car if it is there. */
 async function applyWeather() {
-  const rain = await rainLines(els.track.value, els.weather.value, "lines-wet-bicycle");
+  const rain = state.own ? await rainLines(els.track.value, els.weather.value, linesDir("lines-wet-bicycle", els.car.value)) : {};
   state.offsets = { ...state.dry, ...rain };
   const chosen = rain.rain ? "rain" : els.line.value;
   els.line.replaceChildren(...DRIVEN.filter((key) => state.offsets[key]).map((key) => new Option(LINE_NAMES[key], key)));
@@ -181,6 +186,7 @@ function wire() {
   els.line.addEventListener("change", restart);
   for (const select of [els.view, els.pad, els.opponent, els.weather]) remember(select, () => els.road.focus());
   els.opponent.addEventListener("change", restart);
+  remember(els.car, () => selectTrack(els.track.value));
   els.weather.addEventListener("change", () => state.dry && applyWeather());
   els.restart.addEventListener("click", restart);
   els.pause.addEventListener("click", () => (state.paused = !state.paused));
