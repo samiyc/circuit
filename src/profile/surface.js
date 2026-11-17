@@ -53,8 +53,26 @@ function fillBand({ wet, line, half = BAND.half, drop = 0 }, { x, y }, grip) {
 }
 
 /**
+ * The road's grip under a car at (x, y), its nearest point of the track i (the car that slips, src/drive/: the dry
+ * line's points are indexed as the track's). Its distance to the dry line is across the track, along the normal at i:
+ * the points are metres apart along it.
+ * @param {Surface | undefined} surface
+ * @param {{ nx: Float64Array, ny: Float64Array }} track
+ * @param {number} i
+ * @param {{ x: number, y: number }} car
+ */
+export function gripAt(surface, { nx, ny }, i, { x, y }) {
+  if (!surface) return 1;
+  if (!surface.line || !surface.drop) return surface.wet;
+  const half = surface.half ?? BAND.half;
+  const across = (x - surface.line.x[i]) * nx[i] + (y - surface.line.y[i]) * ny[i];
+  const near = Math.max(0, 1 - (across * across) / (half * half));
+  return surface.wet * (1 - surface.drop * near * near);
+}
+
+/**
  * The car on a surface.
- * @template {import("../types.js").Car} C
+ * @template {Record<string, any>} C
  * @param {C} car
  * @param {Surface} surface
  * @returns {C}

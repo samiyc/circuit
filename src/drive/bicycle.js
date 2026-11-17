@@ -8,9 +8,11 @@ import { PL_TYRE, lateralShare } from "./tyre.js";
  * angle through the tyre's curve (./tyre.js), within what its longitudinal force leaves of the friction ellipse. The
  * rear wheels drive; braking takes each axle's grip in proportion (an ideal balance, no locked wheel). The driver
  * sets a steering angle and a pedal, from −1 (full brake) to 1 (full throttle); the car follows them with a lag.
+ * The road's grip under the car (the rain, P8: src/profile/surface.js) scales every force the tyres give; whoever steps
+ * the car sets it in the state (`roadGrip`, ./run.js), 1 on a dry road.
  * Pure: a state and controls in, the state stepped in place (no allocation, for the searches).
  * @typedef {ReturnType<typeof createBicycle>} Bicycle
- * @typedef {{ x: number, y: number, heading: number, u: number, v: number, r: number, steer: number, pedal: number, ax: number }} CarState
+ * @typedef {{ x: number, y: number, heading: number, u: number, v: number, r: number, steer: number, pedal: number, ax: number, grip: number }} CarState
  * @typedef {{ steer: number, pedal: number }} Controls
  */
 
@@ -49,6 +51,8 @@ export function createBicycle(file = TUM_F1, chassis = CHASSIS, tyre = PL_TYRE) 
     nominalLoad: file.fz0,
     /** traction control and ABS (`assisted`): Sami's car only, never the drivers measured */
     assists: false,
+    /** @type {import("../types.js").Surface | undefined} the road it drives on, dry without one */
+    surface: undefined,
   };
 }
 
@@ -69,7 +73,7 @@ export function profileCar({ point, front, rear }) {
  * @returns {CarState}
  */
 export function createCarState({ x, y, heading, speed }) {
-  return { x, y, heading, u: speed, v: 0, r: 0, steer: 0, pedal: 0, ax: 0 };
+  return { x, y, heading, u: speed, v: 0, r: 0, steer: 0, pedal: 0, ax: 0, grip: 1 };
 }
 
 /** The forces of a substep, reused (the step does not allocate). */
@@ -77,6 +81,8 @@ const force = { x: 0, y: 0, yaw: 0 };
 const drive = { front: 0, rear: 0 };
 /** Each axle's slip angle of the substep, rad, for the assists. */
 const slips = { front: 0, rear: 0 };
+/** The road's grip under the car in this substep. */
+const road = { grip: 1 };
 
 /**
  * An axle's grip as μ·Fz, each μ shifted by the load of one of its two tyres.
@@ -86,7 +92,7 @@ const slips = { front: 0, rear: 0 };
  * @param {"muX" | "muY"} direction
  */
 function grip(car, axle, load, direction) {
-  return (axle[direction] + car.loadSensitivity * (load / 2 - car.nominalLoad)) * load;
+  return road.grip * (axle[direction] + car.loadSensitivity * (load / 2 - car.nominalLoad)) * load;
 }
 
 /**
@@ -143,6 +149,7 @@ function computeForces(car, state) {
   const transfer = (car.mass * state.ax * car.cogHeight) / car.wheelbase;
   const loadFront = Math.max(0, (weight * car.lr) / car.wheelbase + car.downFront * u * u - transfer);
   const loadRear = Math.max(0, (weight * car.lf) / car.wheelbase + car.downRear * u * u + transfer);
+  road.grip = state.grip;
   slips.front = steer - Math.atan2(v + car.lf * r, u);
   slips.rear = -Math.atan2(v - car.lr * r, u);
   longitudinalForces(car, state, loadFront, loadRear);

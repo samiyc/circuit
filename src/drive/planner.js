@@ -2,7 +2,7 @@ import { createClimb } from "mcts-commun/climb.js";
 import { createRng } from "mcts-commun/random.js";
 import { stepCar } from "./bicycle.js";
 import { TUNED, createPursuit, nearestPoint, pursue } from "./pursuit.js";
-import { TICK, pastEdge } from "./run.js";
+import { TICK, pastEdge, roadGrip } from "./run.js";
 
 /**
  * P7, the driver by search (docs/pilote.md § 9): the tuned pure-pursuit driver, corrected by a plan that the
@@ -95,6 +95,7 @@ export function scorePlan(planner, plan) {
     /** @type {[number, number]} */
     const offsets = [plan[2 * s], plan[2 * s + 1]];
     for (let k = 0; k < ticks; k += 1) {
+      roadGrip(car, track, probe, shadow.index);
       stepCar(car, probe, corrected(planner, shadow, probe, offsets), TICK);
       if (pastEdge(track, shadow.index, probe) > 0) fine += settings.offFine;
       if (Math.abs(probe.v) > 0.15 * probe.u) fine += settings.slideFine;

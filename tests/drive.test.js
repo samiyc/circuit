@@ -4,14 +4,15 @@ import { pointMassF1 } from "../src/car.js";
 import { CHASSIS, createBicycle, createCarState, profileCar, stepCar } from "../src/drive/bicycle.js";
 import { TUNED, createPursuit, gripLeft, nearestPoint, pathOf, pedalFor, pursue } from "../src/drive/pursuit.js";
 import { LATERAL_LIMIT, controlsOf, keyboardInput, lockAt, mergeInputs, padInput } from "../src/drive/input.js";
-import { driveLap, driveLine, pastEdge, sideOf, startOf } from "../src/drive/run.js";
+import { TICK, driveLap, driveLine, pastEdge, sideOf, startOf } from "../src/drive/run.js";
 import { FEED_FIELDS, createFeed, feedTicks } from "../src/drive/feed.js";
 import { createSession, fedTicks, feedSession, lapGap, tickSession } from "../src/drive/session.js";
 import { PLANNER, createPlanner, plannedControls, scorePlan } from "../src/drive/planner.js";
 import { PL_TYRE, lateralShare, peakSlip } from "../src/drive/tyre.js";
-import { lineBounds } from "../src/line/line.js";
+import { lineBounds, linePoints } from "../src/line/line.js";
 import { minCurvatureLine } from "../src/line/references.js";
 import { cornerSpeed, driveAcceleration } from "../src/profile/grip.js";
+import { BAND, WET, gripAt, onSurface } from "../src/profile/surface.js";
 import { ring, roundedPolygon } from "../src/track/shapes.js";
 import { createTrack } from "../src/track/track.js";
 import { createLap } from "../src/view/lap.js";
@@ -197,6 +198,26 @@ describe("a drive on the page", () => {
     assert.equal(on.playerCar.assists, true);
     assert.equal(on.car.assists, false);
     assert.equal(createSession({ track: square, path, car: CAR, assists: false }).playerCar.assists, false);
+  });
+
+  it("drives in the rain: the grip under each car is the road's, the band's on the dry line, and the lap is slower", () => {
+    const offsets = minCurvatureLine(square, lineBounds(square)).offsets;
+    const surface = { wet: WET, line: linePoints(square, offsets), ...BAND };
+    const wetPath = pathOf(createLap(square, onSurface(profileCar(CAR), surface), offsets), square);
+    const [dry, wet] = [createSession({ track: square, path, car: CAR }), createSession({ track: square, path: wetPath, car: onSurface(CAR, surface) })];
+    const hands = { throttle: 0, brake: 0, steer: 0, analog: false };
+    const grips = [0, 0];
+    [dry, wet].forEach((session, k) => {
+      while (session.robot.laps.length < 1 && session.time < 200) {
+        tickSession(session, hands);
+        grips[k] += session.robot.state.grip * TICK;
+      }
+    });
+    assert.equal(grips[0] / dry.time, 1);
+    const mean = grips[1] / wet.time;
+    assert.ok(mean < WET * (1 - BAND.drop / 2), `the driver on the dry line: ${mean}`);
+    assert.equal(gripAt(surface, square, 7, { x: surface.line.x[7] + 0.5 * square.ny[7], y: surface.line.y[7] - 0.5 * square.nx[7] }), WET * (1 - BAND.drop));
+    assert.ok(wet.robot.laps[0].time > 1.1 * dry.robot.laps[0].time, `${wet.robot.laps[0].time} s against ${dry.robot.laps[0].time} s`);
   });
 
   it("drives the driver by search on the worker's states, chunk by chunk as at once, waiting when they run dry", () => {

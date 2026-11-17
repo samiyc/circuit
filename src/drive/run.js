@@ -1,3 +1,4 @@
+import { gripAt } from "../profile/surface.js";
 import { createLap } from "../view/lap.js";
 import { createBicycle, createCarState, profileCar, stepCar } from "./bicycle.js";
 import { PURSUIT, createPursuit, nearestPoint, pathOf, pursue } from "./pursuit.js";
@@ -30,6 +31,17 @@ export const TICK = 0.01;
 export function startOf(path, share = 1) {
   const heading = Math.atan2(path.y[1] - path.y[0], path.x[1] - path.x[0]);
   return createCarState({ x: path.x[0], y: path.y[0], heading, speed: share * path.speed[0] });
+}
+
+/**
+ * The road's grip under the car, into its state, from the car's surface (the rain, P8); before each step.
+ * @param {{ surface?: import("../types.js").Surface }} car
+ * @param {Track} track
+ * @param {CarState} state
+ * @param {number} index the car's nearest point
+ */
+export function roadGrip(car, track, state, index) {
+  state.grip = gripAt(car.surface, track, index, state);
 }
 
 /**
@@ -92,6 +104,7 @@ export function driveLap({ track, path, car, drive, driver }, { state = startOf(
   const lap = { finished: false, time: 0, offTime: 0, deviation: 0 };
   let [index, passed] = [0, 0];
   while (lap.time < limit) {
+    roadGrip(car, track, state, index);
     stepCar(car, state, drive(state), TICK);
     lap.time += TICK;
     const next = nearestPoint(path, index, state.x, state.y);

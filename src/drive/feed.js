@@ -1,7 +1,7 @@
 import { stepCar } from "./bicycle.js";
 import { createPlanner, plannedControls } from "./planner.js";
 import { nearestPoint } from "./pursuit.js";
-import { TICK, startOf } from "./run.js";
+import { TICK, roadGrip, startOf } from "./run.js";
 
 /**
  * The driver by search on the drive page (P7, docs/pilote.md § 9): its search takes about 50 ms every 0.25 s, too long
@@ -36,6 +36,7 @@ export function feedTicks(feed, ticks) {
   const { where, planner, state } = feed;
   const chunk = new Float64Array(ticks * FEED_FIELDS);
   for (let k = 0; k < ticks; k += 1) {
+    roadGrip(where.car, where.track, state, feed.index);
     stepCar(where.car, state, plannedControls(planner, state), TICK);
     feed.index = nearestPoint(where.path, feed.index, state.x, state.y);
     planner.driver.index = feed.index;

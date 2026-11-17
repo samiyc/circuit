@@ -2,7 +2,7 @@ import { stepCar } from "./bicycle.js";
 import { FEED_FIELDS } from "./feed.js";
 import { controlsOf } from "./input.js";
 import { TUNED, createPursuit, nearestPoint, pursue } from "./pursuit.js";
-import { TICK, advance, pastEdge, startOf } from "./run.js";
+import { TICK, advance, pastEdge, roadGrip, startOf } from "./run.js";
 
 /**
  * A drive on the page (J4, P9): Sami's car and the driver's car, both from the line's start at its profile's speed,
@@ -73,9 +73,11 @@ export function fedTicks({ robot }) {
 }
 
 /** The driver's tick: the rule's step, or the feed's next state; false when the feed is dry. @param {Session} session */
-function driveRobot({ car, robot }) {
+function driveRobot(session) {
+  const { car, robot } = session;
   if (robot.driver) {
     robot.driver.index = robot.index;
+    roadGrip(car, session.track, robot.state, robot.index);
     stepCar(car, robot.state, pursue(robot.driver, car, robot.state), TICK);
     return true;
   }
@@ -100,6 +102,7 @@ export function tickSession(session, input) {
   const { car, playerCar, player, robot } = session;
   const controls = controlsOf(input, session.share, { car, speed: player.state.u, dt: TICK });
   session.share = controls.share;
+  roadGrip(playerCar, session.track, player.state, player.index);
   stepCar(playerCar, player.state, controls, TICK);
   session.time += TICK;
   place(session, player);
