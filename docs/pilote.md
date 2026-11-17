@@ -222,11 +222,46 @@ pure (`src/drive/input.js`), et la course par `src/drive/session.js`, tous deux 
 
 ## 8. La suite
 
-- **Le retour de Sami** sur le pilotage : la direction au clavier, la butée réduite, le champ de vue. Ce sont des
-  hypothèses de jeu, à régler sur son ressenti.
-- **Les pilotes par recherche** : le faisceau et l'escalade sur un plan de quelques pas, comme sur Mad Pod Racing, contre
-  le pilote réglé.
-- **P6**, l'escalade sur les entrées pas à pas, après.
+- **Le retour de Sami** sur la conduite avec les aides, les vues et les gâchettes (0.4.2 et 0.5.0).
+- **Le pilote par recherche sur la page** (§ 9) : il coûte 21 % d'un cœur, en pics de 50 ms toutes les 0,25 s. Il
+  lui faut un worker pour ne pas faire saccader l'image.
+- **P6**, l'escalade sur les entrées pas à pas, sans règle dessous.
+
+## 9. Le pilote par recherche (P7, 17/11)
+
+`src/drive/planner.js` reprend le principe des bots de Mad Pod Racing : un plan sur les prochains instants, amélioré
+par l'escalade de la lib (`createClimb`) à partir du meilleur plan du tour précédent, décalé.
+- **Le plan** : pour chaque segment de 0,25 s, un écart de direction et un écart de pédale, ajoutés aux commandes du
+  pilote réglé (`TUNED`). Le plan nul est la règle elle-même, et chaque recherche part de lui.
+- **La note d'un plan** : on simule l'horizon depuis l'état de la voiture. On compte les mètres gagnés le long de la
+  ligne. On retire les mètres qu'il faudrait pour freiner jusqu'au profil (à 40 m/s², une hypothèse), une amende par
+  tic hors piste ou en glissade, et l'écart à la ligne en fin d'horizon, multiplié par `stray`.
+- **Le banc** (`scripts/p7-planner.js`, par la file) : les 25 pistes, la courbure minimale et la meilleure ligne de
+  `data/lines-bicycle/`. La règle et le planificateur partent du même point. Les écarts sont appariés : intervalle à
+  95 %, sur les 48 tours que les deux finissent.
+
+Quatre tours de mesure, 23 variantes :
+
+| Variante | Tours finis | Écart au profil | Hors piste | Gagné sur la règle |
+|---|--:|--:|--:|--:|
+| la règle (`TUNED`) | 48 / 50 | 8,0 % | 17,9 s | – |
+| 1,5 s d'horizon, 40 plans | 46 / 50 | 7,8 % | 13,4 s | 0,15 ± 0,19 s |
+| la même, 100 plans | 39 / 50 | 8,3 % | 9,6 s | −0,16 ± 0,34 s |
+| 2 s, `stray` 3 (3 graines) | 50 / 50 | 6,9 à 7,0 % | 4 à 6 s | 0,82 à 0,91 s |
+| 2,5 s, `stray` 6, 40 plans | 50 / 50 | 6,7 % | 0,4 s | 1,02 ± 0,19 s |
+| 2,5 s, `stray` 6, 100 plans (2 graines) | 50 / 50 | 5,8 à 6,0 % | 0 à 1 s | 1,61 à 1,71 s |
+| **la même, pédale 0,45 (`PLANNER`)** | **50 / 50** | **5,4 %** | **0,1 s** | **2,06 ± 0,23 s** |
+| la même, 200 plans | 50 / 50 | 5,5 % | 0,1 s | 1,99 ± 0,20 s |
+
+- **L'effet d'horizon d'abord.** Sans terme de fin, chercher plus fait pire (39 tours finis à 100 plans au lieu de 46).
+  La recherche trouve des plans qui gagnent des mètres sur 1,5 s mais laissent la voiture loin de la ligne, là où la
+  règle ne la rattrape plus. Une fois l'écart en fin d'horizon compté, chercher plus paie, jusqu'à environ 100 plans.
+  C'est la leçon de Mad Pod Racing : la note de la fin du plan compte autant que le plan.
+- **Le planificateur finit les deux tours que la règle manque** (Oschersleben et Sakhir, meilleure ligne). Il bat la
+  règle sur 46 tours sur 48. Il reste à 5,4 % du profil : le profil suppose un point matériel qui tient sa vitesse de
+  virage à la limite, ce que la bicyclette ne fait pas tout à fait.
+- **Le coût** : 400 plans par seconde de course, chacun 2,5 s simulées. Il faut environ 13 s de calcul pour une minute
+  de course, soit 21 % d'un cœur.
 
 **Décidé avec Sami le 17/11** : la page Piloter prend les lignes de la bicyclette (`data/lines-bicycle/`, § 6 bis),
 plus rapides sur les 25 pistes, et à défaut celles du point matériel. La page des lignes garde celles du point

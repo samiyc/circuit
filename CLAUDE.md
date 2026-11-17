@@ -70,7 +70,9 @@ Its line in the roadmap: `mcts-commun/docs/feuille-de-route.md`, § 2.C. Start t
   100 Hz tick, and the pure-pursuit driver as the rule to beat. `npm run drive` drives the lines of `data/lines/` on
   the 25 tracks (3 s), by hand (`PURSUIT`) and tuned by CMA-ES (`TUNED`, `scripts/p7.js`): 24/25 and 25/25 laps of
   the minimum-curvature line, 5.5 % and 7.6 % over the bicycle's profile (`profileCar`, the point mass at the front
-  axle's μy). A change to the car or the driver says what it does to these figures.
+  axle's μy). A change to the car or the driver says what it does to these figures. The driver by search
+  (`src/drive/planner.js`, a climb on a 2.5 s plan over `TUNED`, `scripts/p7-planner.js` through the queue): 50/50
+  laps at 5.4 %, 2.06 ± 0.23 s a lap better than `TUNED` (docs/pilote.md § 9).
 - **The drive page** (`web/drive.html`, P9): Sami's car under his keys or gamepad (`src/drive/input.js`, pure),
   against the tuned driver and the ghost of the line's profile (`src/drive/session.js`), on the lines searched for
   the bicycle (`npm run lines -- --bicycle`, `data/lines-bicycle/`, 0.43 s faster; Sami, 17/11), else `data/lines/`.

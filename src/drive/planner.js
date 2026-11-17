@@ -18,17 +18,18 @@ import { TICK, pastEdge } from "./run.js";
  * @typedef {{ segments: number, segment: number, budget: number, steer: number, pedal: number, brake: number, offFine: number, slideFine: number, stray: number }} PlannerSettings
  */
 
+/** Measured on the 25 tracks in four rounds through the queue (docs/pilote.md § 9): the best of 23 variants. */
 /** @type {Readonly<PlannerSettings>} */
 export const PLANNER = Object.freeze({
-  segments: 6, // the horizon, in segments
+  segments: 10, // the horizon, in segments: 2.5 s
   segment: 0.25, // s, a segment: the plan's step, and how often the search runs
-  budget: 40, // plans scored at each search
+  budget: 100, // plans scored at each search: 400 a second of driving
   steer: 0.02, // rad of steering offset per unit of gene
-  pedal: 0.3, // pedal offset per unit of gene
-  brake: 30, // m/s², the deceleration the end of the horizon is judged by (a hypothesis, below an F1's 4 to 5 g)
+  pedal: 0.45, // pedal offset per unit of gene
+  brake: 40, // m/s², the deceleration the end of the horizon is judged by (a hypothesis, about an F1's 4 g)
   offFine: 2, // m a tick off the track
   slideFine: 2, // m a tick sliding: |v| over 15 % of u
-  stray: 0, // m lost per metre off the line at the end of the horizon (the horizon's effect: a plan that ends astray)
+  stray: 6, // m lost per metre off the line at the end of the horizon: without it, the search ends its plans astray
 });
 
 const LIMIT = 3;

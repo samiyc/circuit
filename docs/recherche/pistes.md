@@ -102,6 +102,9 @@ pas, et ses entrées tremblent.
   de quelques pas comme sur Mad Pod Racing.
 - **La mesure** : le temps au tour et l'écart à la ligne, sur les mêmes pistes, avec des perturbations tirées par
   graine (un coup de vent, une plaque glissante).
+- **Mesuré le 17/11** ([../pilote.md](../pilote.md) § 9) : l'escalade sur un plan de 2,5 s, qui corrige la règle réglée,
+  la bat de 2,06 ± 0,23 s par tour et finit 50 tours sur 50 (48 pour la règle). La clé est l'écart à la ligne compté en
+  fin d'horizon. Le faisceau reste à essayer.
 
 ## P8. La pluie et les surfaces (J5)
 
