@@ -166,4 +166,5 @@ un pilote par recherche qui marche.
 ([voitures.md](voitures.md)). **Mesuré le 17/11 pour la Formule E** ([../voitures.md](../voitures.md)) : sa ligne
 gagne 4,1 s sur celle de la F1, 25/25 ; elle aborde les virages de plus loin et en ressort plus large. La règle
 réglée pour la F1 ne tient pas sa meilleure ligne, le pilote par recherche si (48 tours sur 50). Ensuite : le rallye
-sur la terre, puis la GT3, puis le drift.
+sur la terre, puis la GT3, puis le drift. **La Rally2 sur la terre, le même soir** : sa ligne gagne 13 s sur celle
+de la F1, dans le sens de la Formule E en plus marqué ; nos pilotes ne la tiennent qu'à 52 % au-dessus du profil.

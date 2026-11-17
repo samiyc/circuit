@@ -20,6 +20,8 @@ const options = Object.fromEntries(args.filter((arg) => arg.includes("=")).map((
 const CAR = bicycleOf(options.car ?? "f1");
 /** The rule both drive on: the car's (P7's for the F1). */
 const TUNED = carOf(options.car ?? "f1").rule;
+/** The rule the search corrects: the car's (`search`), or the rule's with `base=rule`. */
+const SEARCHED = options.base === "rule" ? TUNED : carOf(options.car ?? "f1").search;
 const names = args.filter((arg) => !arg.includes("=")).length ? args.filter((arg) => !arg.includes("=")) : TRACK_NAMES;
 const settings = { ...PLANNER, ...Object.fromEntries(Object.keys(PLANNER).filter((key) => key in options).map((key) => [key, Number(options[key])])) };
 
@@ -30,7 +32,7 @@ function race(name, track, offsets, line) {
   const start = () => startOf(path, TUNED.margin);
   const rule = createPursuit(path, TUNED);
   const ruled = driveLap({ track, path, car: CAR, driver: rule, drive: (state) => pursue(rule, CAR, state) }, { state: start() });
-  const planner = createPlanner({ track, path, car: CAR }, { settings, rule: TUNED, seed: Number(options.seed ?? 1) });
+  const planner = createPlanner({ track, path, car: CAR }, { settings, rule: SEARCHED, seed: Number(options.seed ?? 1) });
   const planned = driveLap({ track, path, car: CAR, driver: planner.driver, drive: (state) => plannedControls(planner, state) }, { state: start() });
   const shown = (lap2) => (lap2.finished ? lap2.time.toFixed(2) : `arrêt à ${lap2.time.toFixed(1)}`);
   console.log(`${name} ${line} : profil ${lap.time.toFixed(2)}, règle ${shown(ruled)} (${ruled.offTime.toFixed(2)} hors piste), planifié ${shown(planned)} (${planned.offTime.toFixed(2)})`);

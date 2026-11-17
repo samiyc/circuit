@@ -4,6 +4,17 @@
   "intro": "Une F1 sur les circuits de TU Munich, en simulation : la ligne idéale calculée hors ligne, puis un pilote qui la suit, puis Sami aux commandes, contre lui.",
   "versions": [
     {
+      "version": "0.10.0",
+      "title": "La Rally2 sur la terre",
+      "date": "17/11/2026",
+      "commits": [],
+      "items": [
+        "Une troisième voiture sur la page Piloter : une Rally2 sur la terre (1 230 kg, 214 kW, quatre roues motrices, deux fois moins d'adhérence), sur les lignes cherchées pour elle.",
+        "Chaque voiture a son pilote réglé : la Formule E finit désormais tous ses tours.",
+        "La Rally2 est dure à tenir : nos pilotes roulent loin de sa limite. À toi d'essayer."
+      ]
+    },
+    {
       "version": "0.9.0",
       "title": "La Formule E",
       "date": "17/11/2026",

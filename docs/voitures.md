@@ -1,4 +1,4 @@
-# D'autres voitures : la Formule E (17/11)
+# D'autres voitures : la Formule E et la Rally2 (17/11)
 
 **La question** ([recherche/voitures.md](recherche/voitures.md)) : la ligne et le pilotage changent-ils avec la
 voiture ? **Décidé avec Sami le 17/11** : la Formule E d'abord, la seule voiture sans hypothèse ; puis le rallye sur
@@ -79,6 +79,14 @@ Le pilote par recherche gagne 1,37 s [0,92 ; 1,83] par tour sur la règle, sur l
 22 pistes sur 25. La recherche la rattrape presque partout ; elle échoue à Spielberg et à Zandvoort. Pour la F1, les
 deux finissaient 48 et 50 tours sur 50 ([pilote.md](pilote.md) § 9).
 
+**Une règle à elle** (Sami, 17/11 : « ok ») : P7 refait pour la Formule E (`node scripts/p7.js --bicycle --car=fe
+marginLow=0.7`, le score d'un tour raté tient compte de la part tenue). La première recherche, la marge entre 0,9 et
+1,05, butait sur 0,9 : 46 tours sur 50 à 15,5 %. Élargie à 0,7, la règle `TUNED_FE` (`src/cars.js`) demande 86 % de
+la vitesse du profil et regarde 0,1 s devant : **50 tours sur 50, à 18,7 % du profil**. Elle est sûre, mais lente ;
+le pilote par recherche qui la corrige finit 49 tours sur 50 à 13,3 % (6,15 s [5,56 ; 6,74] gagnés par tour, 47/2),
+moins vite qu'en corrigeant la règle de la F1 (48 tours sur 50 à 7,1 %). **Sur la page, l'adversaire « pilote réglé »
+suit `TUNED_FE`, le pilote par recherche corrige la règle de la F1** (`search` dans `src/cars.js`).
+
 **Sous la pluie** (la bicyclette) : la ligne sèche roule à 108,3 % de son temps sec sur la route mouillée (la F1 :
 110,6 % pour le point matériel). Moins de son tour dépend de l'adhérence : elle est limitée par sa puissance plus
 souvent. Sa ligne de pluie gagne 1,60 s [1,21 ; 1,98] sur la route mouillée, 7,18 s [6,46 ; 7,90] avec la trajectoire
@@ -89,13 +97,77 @@ qui compte est la comparaison, la même recherche sur les deux voitures. La cour
 
 ## 4. Sur la page
 
-La page Piloter (0.9.0) a un menu **Voiture** : la F1 ou la Formule E. La voiture de Sami, le pilote (dans son
+La page Piloter (0.9.0, la Rally2 en 0.10.0) a un menu **Voiture** : la F1, la Formule E ou la Rally2 sur la terre. La voiture de Sami, le pilote (dans son
 worker) et le fantôme deviennent des Formule E, sur les lignes cherchées pour elle, au sec comme sous la pluie. Sans
-ses lignes, la page prend celles de la F1 et le dit. Le meilleur tour se garde par voiture.
+ses lignes, la page prend celles de la F1 et le dit. Le meilleur tour se garde par voiture. Chaque voiture a sa règle
+(l'adversaire « pilote réglé ») et la règle que corrige son pilote par recherche.
+
+## 5. La Rally2 sur la terre
+
+**Décidé avec Sami le 17/11** : μ = 0,5 sur la terre et la moitié de la traction à l'avant, deux hypothèses à
+remplacer si une meilleure source apparaît. La voiture (`RALLY2`, `src/cars.js`) :
+
+| | Rally2 | La source |
+|---|--:|---|
+| Masse | 1 230 kg | le minimum de la FIA (Wikipédia) |
+| Empattement | 2,563 m | Wikipédia, Škoda Fabia RS Rally2 |
+| Puissance | 214 kW (289 ch), 430 Nm | Škoda |
+| Transmission | 4 roues, sans différentiel central | Škoda : le règlement l'interdit |
+| μ sur la terre | 0,5, les deux sens, les deux essieux | Velenis, Tsiotras et Lu (SAE 2008), d'après le résumé : à confirmer |
+| Traction à l'avant | 50 % | hypothèse (Sami, 17/11) |
+| Charge à l'avant | 60 % | hypothèse : un moteur transversal à l'avant |
+| Appui | aucun | hypothèse |
+| cw·A | 0,8 m² | hypothèse : Cx 0,4 sur 2 m² |
+| Inertie en lacet | 1 940 kg·m² | hypothèse : m·lf·lr, l'indice dynamique 1 d'une voiture de route |
+| Centre de gravité | 0,45 m | hypothèse |
+
+Sans rapports de boîte, elle atteint 261 km/h en ligne droite, bien plus qu'une vraie Rally2 réglée pour une spéciale.
+Toutes les pistes sont en terre. La courbe du pneu reste celle de la F1 : sur la terre, le pic viendrait à un angle
+plus grand, une hypothèse de plus que nous n'avons pas prise.
+
+**Les quatre roues motrices** dans le modèle : le fichier de chaque voiture dit la part de la traction à l'avant
+(`driveFront`, 0 pour la F1 et la Formule E). Le point matériel tire sur chaque essieu sa part, dans son adhérence ;
+la bicyclette aussi, et la force de l'avant prend sur son ellipse. La F1 ne change pas (les empreintes tiennent).
+
+**La ligne** (le point matériel, entre parenthèses la bicyclette) : son tour fait 233 % du tour de la F1 (226 %). Sa
+ligne gagne **13,29 s [10,88 ; 15,71]** sur celle de la F1 (11,72 s [9,48 ; 13,96]), 25/25 ; la F1 perd 1,61 s sur
+la sienne (1,36 s). Elle passe 37 % du tour au freinage, la F1 16 %. Contre la ligne de la F1 :
+
+| Phase | Point matériel |
+|---|--:|
+| 60 m avant | +1,31 m |
+| entrée | −0,48 m |
+| milieu | −0,11 m |
+| sortie | −0,55 m |
+| 60 m après | +1,61 m |
+
+Le même dessin que la Formule E, trois fois plus marqué : elle arrive de bien plus loin à l'extérieur, plonge vers la
+corde dès l'entrée et ressort large. Avec deux fois moins d'adhérence et sans appui, le virage se prend lentement et
+la ligne cherche le rayon le plus grand.
+
+**Les pilotes ne la tiennent pas.** La règle de la F1 part en tête-à-queue dès le premier virage, sur toutes les
+pistes. Ce n'est ni la terre ni les quatre roues : avec l'inertie de la F1 (450 kg·m²), la même voiture finit le carré
+des tests à 9 % de son profil. Seule, sans pilote, elle est stable. Mais elle est lente à pivoter et neutre à la
+limite : ses deux essieux ont le même μ et chacun la charge qu'il lui faut dans le virage, rien ne la garde du
+survirage (la F1 et la Formule E ont 16 % d'adhérence de plus à l'arrière). P7 (`marginLow=0.6`) la fait rouler à
+65 % de la vitesse du profil : **22 tours sur 50, à 53,5 %** du profil. Le pilote par recherche en finit **46 sur 50**,
+à 51,8 % (3,19 s [2,25 ; 4,13] gagnés, 22/0). Les deux restent loin de la limite : le profil est hors de leur portée,
+et la question du pendule (le contre-braquage avant le virage) ne se pose pas encore. Elle se posera avec un pilote
+qui tient la voiture en dérive, ou entre les mains de Sami : la Rally2 est sur la page.
+
+**Les limites.** Le μ de la terre n'est pas confirmé, la répartition des masses et l'inertie sont supposées, le pneu
+est celui de la F1. Le résultat qui tient : sur une piste deux fois moins adhérente, sans appui, la ligne change
+beaucoup (13 s), dans le sens que prend déjà la Formule E.
 
 ## Sources
 
 - TUM, `laptime-simulation`, `laptimesim/input/vehicles/FE_Berlin.ini` et `F1_Shanghai.ini` (LGPL-3.0), lus le
   17/11/2026 : <https://github.com/TUMFTM/laptime-simulation>
-- Les mesures : `tmp/p7-planner/fe.json`, `data/lines-fe/`, `data/lines-bicycle-fe/`, `data/lines-wet-bicycle-fe/`
+- Wikipédia, Škoda Fabia RS Rally2 : <https://en.wikipedia.org/wiki/%C5%A0koda_Fabia_RS_Rally2>
+- Škoda Storyboard, la transmission de la Fabia RS Rally2 :
+  <https://www.skoda-storyboard.com/en/press-kits/skoda-fabia-rs-rally2-press-kit/drive-newly-developed-turbo-engine-sequential-gearbox-and-all-wheel-drive/>
+- E. Velenis, P. Tsiotras, J. Lu, « Modeling aggressive maneuvers on loose surfaces: the cases of Trail-Braking and
+  Pendulum-Turn » (ECC 2007) et l'article SAE 2008 : leurs PDF ne répondaient plus le 17/11 (404, 403).
+- Les mesures : `tmp/p7/cmaes-bicycle-*-seed-1*.json`, `tmp/p7-planner/{fe-rule,rally-rule}-g*.json`,
+  `data/lines-rally/`, `data/lines-bicycle-rally/`, `tmp/p7-planner/fe.json`, `data/lines-fe/`, `data/lines-bicycle-fe/`, `data/lines-wet-bicycle-fe/`
   (ignorés par git, refaits par les commandes du § 2).

@@ -90,7 +90,9 @@ Its line in the roadmap: `mcts-commun/docs/feuille-de-route.md`, § 2.C. Start t
 - **Other cars** (P13, `docs/voitures.md`, `src/cars.js`): the Formula E of TUM's `FE_Berlin.ini` beside the F1;
   `--car=fe` on `lines.js` and `p8.js` (`car=fe` on `p7-planner.js`) puts its lines in `data/lines-fe/`,
   `data/lines-bicycle-fe/`; `scripts/cars-summary.js` compares: its line gains 4.1 s on the F1's, 25/25. The drive
-  page has a car menu. Next, decided with Sami: rally on gravel, then GT3, drift last.
+  page has a car menu. The Rally2 on gravel (`RALLY2`, μ 0.5, four driven wheels, `driveFront`): its line gains
+  13 s, our drivers hold it only 52 % over its profile. Each car has its P7 rule (`rule`) and the rule its search
+  corrects (`search`). Next, decided with Sami: GT3, drift last.
 
 ## The page
 

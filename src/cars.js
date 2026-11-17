@@ -4,7 +4,9 @@ import { TUNED } from "./drive/pursuit.js";
 
 /**
  * The cars the measures and the pages know (docs/voitures.md), by key: each one's figures, the chassis of its
- * bicycle, and the rule its driver follows (P7's settings, tuned per car). The F1 is the car of every measure before;
+ * bicycle, the rule its driver follows (P7's settings, tuned per car) and the rule the driver by search corrects
+ * (`search`): for the Formula E the F1's, faster under the search (7 % over the profile against 13 %), though alone
+ * it leaves half the laps. The F1 is the car of every measure before;
  * its lines keep their folders, another car's add its key (data/lines-fe/, data/lines-bicycle-fe/).
  * @typedef {keyof typeof CARS} CarKey
  */
@@ -53,15 +55,15 @@ export const RALLY2_CHASSIS = Object.freeze({ ...CHASSIS, yawInertia: 1940, cogH
 
 /**
  * P7 for each car (docs/voitures.md): CMA-ES on its bicycle lines of even rank, seed 1, rounded. The Formula E's with
- * the margin from 0.7 (`marginLow=0.7`): 50 laps of 50, 18 % over the profile; the Rally2's from 0.6: 21 of 50, 53 %.
+ * the margin from 0.7 (`marginLow=0.7`): 50 laps of 50, 19 % over the profile; the Rally2's from 0.6: 22 of 50, 53 %.
  */
 export const TUNED_FE = Object.freeze({ lookTime: 0.1, lookMin: 6.6, margin: 0.86, gain: 0.15, anticipation: 0.8, crossGain: 0 });
 export const TUNED_RALLY = Object.freeze({ lookTime: 0.54, lookMin: 20, margin: 0.65, gain: 0.5, anticipation: 0.29, crossGain: 0 });
 
 export const CARS = Object.freeze({
-  f1: { name: "F1", file: TUM_F1, chassis: CHASSIS, rule: TUNED },
-  fe: { name: "Formule E", file: TUM_FE, chassis: FE_CHASSIS, rule: TUNED_FE },
-  rally: { name: "Rally2 sur la terre", file: RALLY2, chassis: RALLY2_CHASSIS, rule: TUNED_RALLY },
+  f1: { name: "F1", file: TUM_F1, chassis: CHASSIS, rule: TUNED, search: TUNED },
+  fe: { name: "Formule E", file: TUM_FE, chassis: FE_CHASSIS, rule: TUNED_FE, search: TUNED },
+  rally: { name: "Rally2 sur la terre", file: RALLY2, chassis: RALLY2_CHASSIS, rule: TUNED_RALLY, search: TUNED_RALLY },
 });
 
 /** @param {string} key @returns {(typeof CARS)[CarKey]} */

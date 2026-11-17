@@ -10,7 +10,7 @@ voiture de rallye sur la terre tourne en glissant.
 
 **Décidé avec Sami le 17/11, au soir** (« ok pour les pistes 1 à 3 ») : la Formule E d'abord, avec un menu Voiture
 sur la page Piloter ; puis le rallye sur la terre, avant la GT3 ; le drift en dernier, quand le modèle du pneu tiendra
-les grands angles. **La Formule E est mesurée** : [../voitures.md](../voitures.md).
+les grands angles. **La Formule E et la Rally2 sont mesurées** : [../voitures.md](../voitures.md).
 
 ## 1. Ce qu'on sait de chaque voiture
 
