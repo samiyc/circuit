@@ -80,6 +80,12 @@ Its line in the roadmap: `mcts-commun/docs/feuille-de-route.md`, § 2.C. Start t
   His car has the assists (traction control and ABS, T); views from behind (`src/view/chase.js`) or above (V), the
   braking boards (`src/view/boards.js`), two gamepad layouts.
 
+- **The rain** (J5, P8, `docs/pluie.md`): the car carries a surface (`src/profile/surface.js`), a grip a point the
+  profile scales every tyre force by, 1 on a dry road (the fingerprints hold): μ × `WET` (0.83, a wet lap at 111 % of
+  the dry, Pirelli's rule for the intermediates) and, a hypothesis, the dry line's band 15 % more slippery.
+  `node scripts/p8.js wet|band|band30` searches the rain line into `data/lines-wet/` (through the queue);
+  `scripts/p8-summary.js` reads it: 1.30 s gained on the wet road, 6.52 s with the band, the line off it at the apex.
+
 ## The page
 
 - **The page** (J3): `npm run page`, `node node_modules/mcts-commun/bin/serve.js 4809` (4800 to 4808 are the

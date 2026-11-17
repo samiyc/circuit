@@ -4,6 +4,16 @@
   "intro": "Une F1 sur les circuits de TU Munich, en simulation : la ligne idéale calculée hors ligne, puis un pilote qui la suit, puis Sami aux commandes, contre lui.",
   "versions": [
     {
+      "version": "0.7.0",
+      "title": "Les lignes sous la pluie",
+      "date": "17/11/2026",
+      "commits": [],
+      "items": [
+        "Un menu Météo sur la page des lignes : sec, pluie, ou pluie avec la trajectoire sèche plus glissante. Sous la pluie, toutes les lignes roulent sur la route mouillée.",
+        "La ligne de pluie (P8), cherchée pour chaque météo, comparée virage par virage à la meilleure ligne sèche : sur la trajectoire sèche glissante, elle gagne 6,5 s en moyenne et passe 1 m plus à l'extérieur à la corde."
+      ]
+    },
+    {
       "version": "0.6.0",
       "title": "Piloter : le pilote par recherche comme adversaire",
       "date": "17/11/2026",

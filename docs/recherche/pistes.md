@@ -116,6 +116,11 @@ la trajectoire sèche (le caoutchouc et l'asphalte poli y glissent le plus). L'o
 la ligne de pluie des écoles : plus large à l'entrée, droite à la sortie ([questions.md](questions.md) § 4,
 question 3).
 
+**Mesuré le 17/11** ([../pluie.md](../pluie.md) § 3) : la route mouillée seule change peu la ligne (1,3 s gagnés
+sur la ligne sèche). Quand la trajectoire sèche est plus glissante (une hypothèse : 15 % sur 1,5 m), l'optimiseur la
+quitte surtout à la corde, 1 m vers l'extérieur, et gagne 6,5 s. Il reste près d'elle au freinage et en sortie, où
+elle longe le bord extérieur. L'entrée plus large des écoles n'apparaît qu'à moitié.
+
 **P8 bis, la voiture « à la Trackmania »** : peu de freins, beaucoup de dérapage. Sami : « il ne faut presque jamais
 lever le pied ». Le même optimiseur doit retrouver ce style sur cette physique-là. C'est un bon test : la ligne vient
 de la physique, pas de nos idées.

@@ -10,6 +10,7 @@ import { createTrack, parseTrack } from "../src/track/track.js";
 
 /** The lines the page knows, in the order of the menus, with their names. */
 export const LINE_NAMES = Object.freeze({
+  rain: "La ligne de pluie (P8)",
   best: "La recherche finie par la descente",
   search: "La recherche (40 → 20 → 10 m)",
   minCurvature: "La courbure minimale",
