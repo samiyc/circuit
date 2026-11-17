@@ -6,7 +6,7 @@ import { PL_TYRE, lateralShare } from "./tyre.js";
  * as one, with a forward speed u, a sideways speed v and a yaw rate r in the car's frame. Each axle's load is its
  * static share, its downforce and the load transfer of the last acceleration; its lateral force comes from its slip
  * angle through the tyre's curve (./tyre.js), within what its longitudinal force leaves of the friction ellipse. The
- * rear wheels drive; braking takes each axle's grip in proportion (an ideal balance, no locked wheel). The driver
+ * rear wheels drive, or all four in the file's split (`driveFront`, the rally car); braking takes each axle's grip in proportion (an ideal balance, no locked wheel). The driver
  * sets a steering angle and a pedal, from −1 (full brake) to 1 (full throttle); the car follows them with a lag.
  * The road's grip under the car (the rain, P8: src/profile/surface.js) scales every force the tyres give; whoever steps
  * the car sets it in the state (`roadGrip`, ./run.js), 1 on a dry road.
@@ -24,13 +24,6 @@ export const CHASSIS = Object.freeze({
   steerLag: 0.05, // s, a hypothesis: TUM's 0.2 s (an autonomous car's actuator) makes every driver weave at speed
   pedalLag: 0.05, // s, TUM's racecar.ini, t_drive and t_brake
 });
-
-/**
- * The Formula E's (docs/voitures.md, § 2): the height of its centre of gravity from its TUM file (h_cog), its yaw
- * inertia the F1's scaled by m·L² (880 kg on 3.10 m against 733 kg on 3.60 m: 450 → 400 kg·m², a hypothesis), the
- * steering and the pedals the F1's.
- */
-export const FE_CHASSIS = Object.freeze({ ...CHASSIS, yawInertia: 400, cogHeight: 0.345 });
 
 /** The physics' own step inside a tick, s: 400 Hz keeps the tyres stable down to 5 m/s (docs/pilote.md § 2). */
 export const SUBSTEP = 0.0025;
@@ -55,6 +48,7 @@ export function createBicycle(file = TUM_F1, chassis = CHASSIS, tyre = PL_TYRE) 
     front: { muX: file.muxFront, muY: file.muyFront, dmu: file.dmuDfzFront },
     rear: { muX: file.muxRear, muY: file.muyRear, dmu: file.dmuDfzRear },
     nominalLoad: file.fz0,
+    driveFront: file.driveFront,
     /** traction control and ABS (`assisted`): Sami's car only, never the drivers measured */
     assists: false,
     /** @type {import("../types.js").Surface | undefined} the road it drives on, dry without one */
@@ -115,8 +109,9 @@ function lateralForce(car, axle, load, { slip, longitudinal }) {
 }
 
 /**
- * The longitudinal force of each axle from the pedal: the throttle drives the rear within the power and its grip, the
- * brake takes the same share of both axles' grip. Into `drive`.
+ * The longitudinal force of each axle from the pedal: the throttle drives the axles in the car's split, within the
+ * power and each axle's grip (the rear alone for a rear-wheel drive); the brake takes the same share of both axles'
+ * grip. Into `drive`.
  * @param {Bicycle} car
  * @param {CarState} state
  * @param {number} loadFront N
@@ -126,8 +121,11 @@ function longitudinalForces(car, { u, pedal }, loadFront, loadRear) {
   const braking = pedal < 0;
   const front = grip(car, car.front, loadFront, "muX") * assisted(car, slips.front, loadFront);
   const rear = grip(car, car.rear, loadRear, "muX") * assisted(car, slips.rear, loadRear);
-  drive.front = braking ? pedal * front : 0;
-  drive.rear = pedal * (braking ? rear : Math.min(powerAt(car.point, u) / u, rear));
+  const split = car.driveFront;
+  const traction = Math.min(split > 0 ? front / split : Infinity, rear / (1 - split));
+  const pushed = pedal * Math.min(powerAt(car.point, u) / u, traction);
+  drive.front = braking ? pedal * front : split * pushed;
+  drive.rear = braking ? pedal * rear : (1 - split) * pushed;
 }
 
 /**

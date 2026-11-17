@@ -1,4 +1,4 @@
-import { bicycleOf } from "../src/cars.js";
+import { bicycleOf, carOf } from "../src/cars.js";
 import { profileCar } from "../src/drive/bicycle.js";
 import { createFeed, feedTicks } from "../src/drive/feed.js";
 import { pathOf } from "../src/drive/pursuit.js";
@@ -18,7 +18,7 @@ self.onmessage = ({ data }) => {
       const track = createTrack(parseTrack(data.text));
       const [dry, car] = [data.dry ? Float64Array.from(data.dry) : undefined, bicycleOf(data.car)];
       const path = pathOf(createLap(track, carIn(profileCar(car), track, data.weather, dry), Float64Array.from(data.offsets)), track);
-      drive = { id: data.id, feed: createFeed({ track, path, car: carIn(car, track, data.weather, dry) }, { seed: data.seed }) };
+      drive = { id: data.id, feed: createFeed({ track, path, car: carIn(car, track, data.weather, dry) }, { seed: data.seed, rule: carOf(data.car).rule }) };
     }
     if (data.id !== drive.id || !drive.feed) return;
     const chunk = feedTicks(drive.feed, data.ticks);

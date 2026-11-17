@@ -19,10 +19,11 @@ export const FEED_FIELDS = 4;
 /**
  * The driver by search's car on the line's first point, at the profile's speed, as the page's cars.
  * @param {{ track: Track, path: Path, car: Bicycle }} where
- * @param {{ seed?: number, settings?: import("./planner.js").PlannerSettings }} [options]
+ * @param {{ seed?: number, settings?: import("./planner.js").PlannerSettings, rule?: import("./pursuit.js").Settings }} [options]
+ *   rule: the rule the search corrects, the car's (src/cars.js), P7's by default
  */
-export function createFeed(where, { seed = 1, settings } = {}) {
-  return { where, planner: createPlanner(where, { seed, ...(settings && { settings }) }), state: startOf(where.path), index: 0 };
+export function createFeed(where, { seed = 1, settings, rule } = {}) {
+  return { where, planner: createPlanner(where, { seed, ...(settings && { settings }), ...(rule && { rule }) }), state: startOf(where.path), index: 0 };
 }
 
 /** @typedef {ReturnType<typeof createFeed>} Feed */

@@ -32,6 +32,7 @@ export const TUM_F1 = Object.freeze({
   muyRear: 2.15,
   dmuDfzFront: -5.0e-5, // 1/N, both directions
   dmuDfzRear: -5.0e-5,
+  driveFront: 0, // the share of the drive on the front axle: rear-wheel drive
 });
 
 /**
@@ -61,6 +62,7 @@ export const TUM_FE = Object.freeze({
   muyRear: 1.42,
   dmuDfzFront: -2.5e-5,
   dmuDfzRear: -2.0e-5,
+  driveFront: 0,
 });
 
 /** An axle figure for the point mass, weighted by the static load shares (the same on both axles: as it is). */
@@ -69,9 +71,9 @@ function weighted(front, rear, rearShare) {
 }
 
 /**
- * The point mass of a TUM car (the F1 by default): each axle's μ weighted by its static share of the load (the downforce splits about the
- * same way, 45 % in front), the traction on the rear axle alone (it is rear-wheel drive). A hypothesis of
- * docs/modele.md, § 2, not a figure of the source.
+ * The point mass of a TUM car (the F1 by default): each axle's μ weighted by its static share of the load (the
+ * downforce splits about the same way, 45 % in front), the traction on the driven axles, each its share of the drive
+ * within its grip (the rear alone for the F1). A hypothesis of docs/modele.md, § 2, not a figure of the source.
  * @param {CarFile} [file]
  * @returns {Car}
  */
@@ -83,7 +85,10 @@ export function pointMass(file = TUM_F1) {
     gravity: file.g,
     muX: frontShare * file.muxFront + rearShare * file.muxRear,
     muY: frontShare * file.muyFront + rearShare * file.muyRear,
-    driveMu: rearShare * file.muxRear,
+    driveMu: Math.min(
+      file.driveFront > 0 ? (frontShare * file.muxFront) / file.driveFront : Infinity,
+      (rearShare * file.muxRear) / (1 - file.driveFront),
+    ),
     loadSensitivity: weighted(file.dmuDfzFront, file.dmuDfzRear, rearShare),
     nominalLoad: file.fz0,
     downforce: 0.5 * file.rhoAir * (file.czAFront + file.czARear),

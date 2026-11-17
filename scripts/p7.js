@@ -2,7 +2,8 @@ import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { createClimb } from "mcts-commun/climb.js";
 import { createCmaes } from "mcts-commun/cmaes.js";
 import { createRng } from "mcts-commun/random.js";
-import { createBicycle, profileCar } from "../src/drive/bicycle.js";
+import { bicycleOf } from "../src/cars.js";
+import { profileCar } from "../src/drive/bicycle.js";
 import { PURSUIT, createPursuit, pathOf, pursue } from "../src/drive/pursuit.js";
 import { driveLap, startOf } from "../src/drive/run.js";
 import { createLap } from "../src/view/lap.js";
@@ -12,15 +13,19 @@ import { TRACK_NAMES, linesOption, readTrack, tracksDownloaded } from "./lib/tra
  * P7, the pure-pursuit driver tuned (docs/pilote.md § 6): its six settings, each gene in [0, 1] mapped onto a range,
  * scored on the tracks of even rank (the minimum-curvature line and the best one) and checked on the others. A lap
  * scores its time over the profile's, less one, plus its seconds off the track over the profile; a lap not finished
- * scores FAILED. Two searches at an equal budget of plans from the hand rule: CMA-ES (`search=cmaes`, `generations`
+ * scores FAILED, less the share of it driven (the longer it holds, the better: a car that leaves every lap still has
+ * a slope to climb, the rally car, docs/voitures.md § 5). Two searches at an equal budget of plans from the hand rule: CMA-ES (`search=cmaes`, `generations`
  * of its population) or the library's hill climb (`search=climb`, one gene moved, kept in its range), the third
- * comparison after economie's R3 (board, 16/11). `--bicycle`: the lines of data/lines-bicycle/.
- * `node scripts/p7.js [search=cmaes] [seed=1] [generations=40] [--bicycle]`, about 3 min: through the queue.
+ * comparison after economie's R3 (board, 16/11). `--bicycle`: the lines of data/lines-bicycle/. `--car=fe`: another
+ * car (src/cars.js) on its lines; `marginLow=0.7` widens the margin's range down (0.9 by default).
+ * `node scripts/p7.js [search=cmaes] [seed=1] [generations=40] [--bicycle] [--car=fe]`, about 3 min: through the queue.
  */
+const OPTION = linesOption(process.argv.slice(2));
+const ARGS = Object.fromEntries(OPTION.rest.map((arg) => arg.split("=")));
 const RANGES = {
   lookTime: [0.1, 0.6],
   lookMin: [1, 20],
-  margin: [0.9, 1.05],
+  margin: [Number(ARGS.marginLow ?? 0.9), 1.05],
   gain: [0.02, 0.5],
   anticipation: [0, 0.8],
   crossGain: [0, 3],
@@ -29,7 +34,7 @@ const GENES = Object.keys(RANGES).length;
 const FAILED = 0.5;
 const SIGMA = 0.2;
 const LINES = ["minCurvature", "best"];
-const CAR = createBicycle();
+const CAR = bicycleOf(OPTION.car);
 
 const clamp = (gene) => Math.min(1, Math.max(0, gene));
 /** @param {Float64Array | number[]} genes @returns {import("../src/drive/pursuit.js").Settings} */
@@ -54,7 +59,7 @@ function drive(course, settings) {
   const { track, path, profile } = course;
   const driver = createPursuit(path, settings);
   const lap = driveLap({ track, path, car: CAR, driver, drive: (state) => pursue(driver, CAR, state) }, { state: startOf(path, settings.margin) });
-  return { score: lap.finished ? (lap.time + lap.offTime) / profile - 1 : FAILED, lap };
+  return { score: lap.finished ? (lap.time + lap.offTime) / profile - 1 : FAILED * (2 - Math.min(1, lap.time / profile)), lap };
 }
 
 /** The mean score over the courses, and per line: the laps finished and the mean gap of those. */
@@ -111,8 +116,7 @@ function tuneClimb(scorer, { seed, budget }) {
 
 function main() {
   if (!tracksDownloaded()) throw new Error("Les pistes manquent : npm run tracks");
-  const option = linesOption(process.argv.slice(2));
-  const args = Object.fromEntries(option.rest.map((arg) => arg.split("=")));
+  const [option, args] = [OPTION, ARGS];
   const [search, seed, generations] = [args.search ?? "cmaes", Number(args.seed ?? 1), Number(args.generations ?? 40)];
   const train = coursesOf(TRACK_NAMES.filter((_, i) => i % 2 === 0), option.dir);
   const test = coursesOf(TRACK_NAMES.filter((_, i) => i % 2 === 1), option.dir);
@@ -120,9 +124,9 @@ function main() {
   const budget = generations * createCmaes({ genes: GENES, mean: genesOf(PURSUIT), sigma: SIGMA }).population;
   const plan = search === "climb" ? tuneClimb(scorer, { seed, budget }) : tuneCmaes(scorer, { seed, generations });
   const best = settingsOf(plan);
-  const result = { search, seed, lines: option.dir, plans: scorer.curve.length, settings: best, default: { train: evaluate(train, PURSUIT), test: evaluate(test, PURSUIT) }, tuned: { train: evaluate(train, best), test: evaluate(test, best) }, curve: scorer.curve };
+  const result = { car: option.car, ranges: RANGES, search, seed, lines: option.dir, plans: scorer.curve.length, settings: best, default: { train: evaluate(train, PURSUIT), test: evaluate(test, PURSUIT) }, tuned: { train: evaluate(train, best), test: evaluate(test, best) }, curve: scorer.curve };
   mkdirSync("tmp/p7", { recursive: true });
-  writeFileSync(`tmp/p7/${search}${option.bicycle ? "-bicycle" : ""}-seed-${seed}.json`, JSON.stringify(result, null, 1));
+  writeFileSync(`tmp/p7/${search}${option.bicycle ? "-bicycle" : ""}${option.car === "f1" ? "" : "-" + option.car}-seed-${seed}.json`, JSON.stringify(result, null, 1));
   console.log(JSON.stringify({ settings: best, default: result.default, tuned: result.tuned }, null, 1));
 }
 

@@ -1,4 +1,4 @@
-import { bicycleOf, linesDir } from "../src/cars.js";
+import { bicycleOf, carOf, linesDir } from "../src/cars.js";
 import { profileCar } from "../src/drive/bicycle.js";
 import { keyboardInput, mergeInputs, padInput } from "../src/drive/input.js";
 import { pathOf } from "../src/drive/pursuit.js";
@@ -45,7 +45,7 @@ function restart() {
   const lap = createLap(track, carIn(profileCar(state.car), track, weather, dry), state.offsets[els.line.value]);
   state.lap = lap;
   const fed = els.opponent.value === "search";
-  state.session = createSession({ track, path: pathOf(lap, track), car: carIn(state.car, track, weather, dry), assists: state.assists, fed });
+  state.session = createSession({ track, path: pathOf(lap, track), car: carIn(state.car, track, weather, dry), settings: carOf(els.car.value).rule, assists: state.assists, fed });
   feed.start(fed ? state.session : null, { car: els.car.value, text: state.text, offsets: state.offsets[els.line.value], weather, dry });
   state.boards = brakingBoards(track, lap);
   state.heading = null;

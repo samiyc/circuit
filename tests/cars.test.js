@@ -2,7 +2,7 @@ import { describe, it } from "node:test";
 import assert from "node:assert/strict";
 import { pointMassF1 } from "../src/car.js";
 import { bicycleOf, carOf, linesDir, pointMassOf } from "../src/cars.js";
-import { createBicycle } from "../src/drive/bicycle.js";
+import { createBicycle, createCarState, stepCar } from "../src/drive/bicycle.js";
 import { driveLine } from "../src/drive/run.js";
 import { lineBounds, linePoints } from "../src/line/line.js";
 import { minCurvatureLine } from "../src/line/references.js";
@@ -32,11 +32,28 @@ describe("the cars", () => {
     assert.ok(time(fe) > 1.1 * time(f1), `${time(fe)} s against ${time(f1)} s`);
   });
 
-  it("drives the Formula E's bicycle round a lap cleanly, a few per cent over its profile", () => {
-    const square = createTrack(roundedPolygon({ sides: 4, straight: 200, radius: 30, spacing: 4, width: 14 }));
-    const lap = driveLine(square, minCurvatureLine(square, lineBounds(square)).offsets, { car: bicycleOf("fe") });
-    assert.ok(lap.finished);
-    assert.equal(lap.offTime, 0);
-    assert.ok(lap.time > lap.profile && lap.time < 1.1 * lap.profile, `${lap.time} s against ${lap.profile} s`);
+  for (const [key, over] of [["fe", 1.1], ["rally", 1.3]]) {
+    it(`drives the ${key} bicycle round a lap cleanly under its rule, within ${over} of its profile`, () => {
+      const square = createTrack(roundedPolygon({ sides: 4, straight: 200, radius: 30, spacing: 4, width: 14 }));
+      const settings = carOf(key).rule;
+      const lap = driveLine(square, minCurvatureLine(square, lineBounds(square)).offsets, { car: bicycleOf(key), settings });
+      assert.ok(lap.finished);
+      assert.equal(lap.offTime, 0);
+      assert.ok(lap.time > lap.profile && lap.time < over * lap.profile, `${lap.time} s against ${lap.profile} s`);
+    });
+  }
+
+  it("drives the rally car's four wheels: half the drive in front, the traction of the axle that slips first", () => {
+    const rally = pointMassOf("rally");
+    assert.ok(Math.abs(rally.driveMu - 0.4) < 1e-3, "the rear's 40 % of the load carries half the drive");
+    assert.ok(rally.driveMu > 0.4 * 0.5 - 1e-9 && rally.driveMu < rally.muX);
+    const launch = (car) => {
+      const state = createCarState({ x: 0, y: 0, heading: 0, speed: 5 });
+      stepCar(car, state, { steer: 0, pedal: 1 }, 1);
+      return state.u;
+    };
+    const rearOnly = bicycleOf("rally");
+    rearOnly.driveFront = 0;
+    assert.ok(launch(bicycleOf("rally")) > launch(rearOnly) + 1, "four driven wheels launch faster on gravel");
   });
 });
