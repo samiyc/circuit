@@ -15,7 +15,7 @@ import { TICK, pastEdge } from "./run.js";
  * @typedef {import("./pursuit.js").Path} Path
  * @typedef {import("./bicycle.js").Bicycle} Bicycle
  * @typedef {import("./bicycle.js").CarState} CarState
- * @typedef {{ segments: number, segment: number, budget: number, steer: number, pedal: number, brake: number, offFine: number, slideFine: number }} PlannerSettings
+ * @typedef {{ segments: number, segment: number, budget: number, steer: number, pedal: number, brake: number, offFine: number, slideFine: number, stray: number }} PlannerSettings
  */
 
 /** @type {Readonly<PlannerSettings>} */
@@ -28,6 +28,7 @@ export const PLANNER = Object.freeze({
   brake: 30, // m/s², the deceleration the end of the horizon is judged by (a hypothesis, below an F1's 4 to 5 g)
   offFine: 2, // m a tick off the track
   slideFine: 2, // m a tick sliding: |v| over 15 % of u
+  stray: 0, // m lost per metre off the line at the end of the horizon (the horizon's effect: a plan that ends astray)
 });
 
 const LIMIT = 3;
@@ -103,8 +104,9 @@ export function scorePlan(planner, plan) {
   const gained = (((along[end] - along[from.index]) % length) + length) % length;
   const wanted = path.speed[end];
   const excess = probe.u > wanted ? (probe.u * probe.u - wanted * wanted) / (2 * settings.brake) : 0;
+  const astray = Math.abs((probe.x - path.x[end]) * path.nx[end] + (probe.y - path.y[end]) * path.ny[end]);
   planner.plans += 1;
-  return gained - excess - fine;
+  return gained - excess - fine - settings.stray * astray;
 }
 
 /** The climb's problem: start from the rule, shift the last best a segment, move a segment's two genes. */
