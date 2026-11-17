@@ -121,9 +121,10 @@ sur la ligne sèche). Quand la trajectoire sèche est plus glissante (une hypoth
 quitte surtout à la corde, 1 m vers l'extérieur, et gagne 6,5 s. Il reste près d'elle au freinage et en sortie, où
 elle longe le bord extérieur. L'entrée plus large des écoles n'apparaît qu'à moitié.
 
-**P8 bis, la voiture « à la Trackmania »** : peu de freins, beaucoup de dérapage. Sami : « il ne faut presque jamais
+**Abandonné le 17/11** (Sami : « c'est trop loin des modèle réel ») ; à la place, d'autres voitures réelles :
+[voitures.md](voitures.md). ~~**P8 bis, la voiture « à la Trackmania »** : peu de freins, beaucoup de dérapage. Sami : « il ne faut presque jamais
 lever le pied ». Le même optimiseur doit retrouver ce style sur cette physique-là. C'est un bon test : la ligne vient
-de la physique, pas de nos idées.
+de la physique, pas de nos idées.~~
 
 ## P9. Sami aux commandes (J4-J5)
 
