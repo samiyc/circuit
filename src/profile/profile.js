@@ -1,12 +1,14 @@
 import { measureLine } from "../geometry.js";
 import { brakeDeceleration, cornerSpeed, driveAcceleration } from "./grip.js";
+import { fillGrip } from "./surface.js";
 
 /**
  * The speed profile of a line and its lap time, the score of every line search (docs/modele.md, § 3): the cornering
  * speed at each point, a forward pass that accelerates under what the ellipse leaves, a backward pass that brakes the
  * same way, then the time of each step at its mean speed (exact under a constant acceleration). A closed line is a
- * flying lap, both passes starting from its slowest corner. The buffers come from `createProfile`: scoring a line
- * allocates nothing.
+ * flying lap, both passes starting from its slowest corner. The road's grip at each point comes from the car's
+ * surface (P8, the rain), 1 everywhere without one. The buffers come from `createProfile`: scoring a line allocates
+ * nothing.
  * @typedef {import("../types.js").Car} Car
  * @typedef {import("../types.js").Profile} Profile
  * @typedef {import("../types.js").Points} Points
@@ -19,7 +21,7 @@ import { brakeDeceleration, cornerSpeed, driveAcceleration } from "./grip.js";
  */
 export function createProfile(count) {
   const buffer = () => new Float64Array(count);
-  return { count, step: buffer(), curvature: buffer(), limit: buffer(), speed: buffer() };
+  return { count, step: buffer(), curvature: buffer(), limit: buffer(), speed: buffer(), grip: buffer().fill(1) };
 }
 
 /**
@@ -29,8 +31,9 @@ export function createProfile(count) {
  * @param {Profile} profile
  * @returns {number} s
  */
-export function lapTime(car, { x, y }, profile) {
-  measureLine(x, y, true, profile);
+export function lapTime(car, line, profile) {
+  measureLine(line.x, line.y, true, profile);
+  fillGrip(car.surface, line, profile.grip);
   const start = setLimits(car, profile);
   const steps = profile.count - 1;
   forwardPass(car, profile, start, steps);
@@ -47,8 +50,9 @@ export function lapTime(car, { x, y }, profile) {
  * @param {number} entrySpeed m/s
  * @returns {number} s
  */
-export function pathTime(car, { x, y }, profile, entrySpeed) {
-  measureLine(x, y, false, profile);
+export function pathTime(car, line, profile, entrySpeed) {
+  measureLine(line.x, line.y, false, profile);
+  fillGrip(car.surface, line, profile.grip);
   setLimits(car, profile);
   profile.speed[0] = Math.min(entrySpeed, profile.limit[0]);
   const steps = profile.count - 1;
@@ -63,10 +67,10 @@ export function pathTime(car, { x, y }, profile, entrySpeed) {
  * @param {Profile} profile
  * @returns {number} the index of the slowest corner
  */
-function setLimits(car, { count, curvature, limit, speed }) {
+function setLimits(car, { count, curvature, limit, speed, grip }) {
   let slowest = 0;
   for (let i = 0; i < count; i += 1) {
-    limit[i] = cornerSpeed(car, curvature[i]);
+    limit[i] = cornerSpeed(car, curvature[i], grip[i]);
     if (limit[i] < limit[slowest]) slowest = i;
   }
   speed[slowest] = limit[slowest];
@@ -80,11 +84,11 @@ function setLimits(car, { count, curvature, limit, speed }) {
  * @param {number} start
  * @param {number} steps
  */
-function forwardPass(car, { count, step, curvature, limit, speed }, start, steps) {
+function forwardPass(car, { count, step, curvature, limit, speed, grip }, start, steps) {
   let i = start;
   for (let k = 0; k < steps; k += 1) {
     const next = i + 1 < count ? i + 1 : 0;
-    const squared = speed[i] * speed[i] + 2 * driveAcceleration(car, speed[i], curvature[i]) * step[i];
+    const squared = speed[i] * speed[i] + 2 * driveAcceleration(car, speed[i], curvature[i], grip[i]) * step[i];
     speed[next] = Math.min(limit[next], Math.sqrt(Math.max(squared, 0)));
     i = next;
   }
@@ -97,11 +101,11 @@ function forwardPass(car, { count, step, curvature, limit, speed }, start, steps
  * @param {number} start
  * @param {number} steps
  */
-function backwardPass(car, { count, step, curvature, speed }, start, steps) {
+function backwardPass(car, { count, step, curvature, speed, grip }, start, steps) {
   let i = start;
   for (let k = 0; k < steps; k += 1) {
     const previous = i > 0 ? i - 1 : count - 1;
-    const squared = speed[i] * speed[i] + 2 * brakeDeceleration(car, speed[i], curvature[i]) * step[previous];
+    const squared = speed[i] * speed[i] + 2 * brakeDeceleration(car, speed[i], curvature[i], grip[i]) * step[previous];
     speed[previous] = Math.min(speed[previous], Math.sqrt(squared));
     i = previous;
   }

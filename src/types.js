@@ -48,6 +48,18 @@
  * @property {number} boostPower the extra power above `boostSpeed` (the electric motor), W
  * @property {number} boostSpeed m/s
  * @property {number} topSpeed where drive meets resistance on a straight, m/s (derived by `createCar`)
+ * @property {Surface} [surface] the road it drives on (P8, the rain), dry without one
+ */
+
+/**
+ * The road's grip (P8, docs/pluie.md): `wet` scales every force the tyres give, everywhere; on a band around `line`
+ * (the dry line, as many points as the lines it scores), the grip drops by `drop` more at the line, smoothly to
+ * nothing `half` metres away from it.
+ * @typedef {object} Surface
+ * @property {number} wet a share of the dry grip, 1 dry
+ * @property {Points} [line] the dry line, where the rubber and the polished asphalt are
+ * @property {number} [half] m, the band's half-width
+ * @property {number} [drop] a share of the grip lost at the line
  */
 
 /**
@@ -58,6 +70,7 @@
  * @property {Float64Array} curvature the signed curvature at point i, 1/m (positive to the left)
  * @property {Float64Array} limit the cornering speed at point i, m/s
  * @property {Float64Array} speed the profile, m/s
+ * @property {Float64Array} grip the road's at point i, a share of the dry (src/profile/surface.js)
  */
 
 export {};

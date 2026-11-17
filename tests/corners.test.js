@@ -1,4 +1,5 @@
 import { describe, it } from "node:test";
+import { BEFORE, PHASES, wetShifts } from "../src/analysis/wet.js";
 import assert from "node:assert/strict";
 import { along, apexOf, apexShifts, findCorners } from "../src/analysis/corners.js";
 
@@ -37,5 +38,25 @@ describe("the apex", () => {
     assert.equal(shift.shift, 15);
     assert.equal(shift.exitGain, 3);
     assert.equal(shift.straightAfter, 35);
+  });
+});
+
+describe("the wet line against the dry one", () => {
+  it("measures the shift to the outside and the share of the band's drop suffered, in each phase of a corner", () => {
+    const n = 100;
+    const step = new Float64Array(n).fill(10);
+    const dry = new Float64Array(n);
+    // A left corner from 40 to 48: the wet line 2 m to the right (outside) before it and at its entry, on the dry line
+    // in its middle, 0.5 m to the left (inside) after.
+    const wet = new Float64Array(n);
+    wet.fill(-2, 34, 43);
+    wet.fill(0.5, 49, 55);
+    const shifts = wetShifts([{ from: 40, to: 48, sign: 1 }], { dry, wet, step, half: 1.5 });
+    assert.deepEqual(Object.keys(shifts), [...PHASES]);
+    assert.deepEqual(shifts.avant, { outward: 2, felt: 0, points: BEFORE / 10 });
+    assert.deepEqual(shifts["entrée"], { outward: 2, felt: 0, points: 3 });
+    assert.deepEqual(shifts.milieu, { outward: 0, felt: 1, points: 3 });
+    assert.equal(shifts["après"].outward, -0.5);
+    assert.ok(Math.abs(shifts["après"].felt - (1 - 0.25 / 2.25) ** 2) < 1e-12);
   });
 });

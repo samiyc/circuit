@@ -3,6 +3,7 @@ import assert from "node:assert/strict";
 import { createCar, normalLoad, gripShift, pointMassF1, resistance, powerAt } from "../src/car.js";
 import { brakeDeceleration, cornerSpeed, driveAcceleration } from "../src/profile/grip.js";
 import { createProfile, lapTime, pathTime } from "../src/profile/profile.js";
+import { BAND, WET, fillGrip, onSurface } from "../src/profile/surface.js";
 import { ring, stadium } from "../src/track/shapes.js";
 
 /** The textbook point mass: μ = 1.2 both ways, no air, no rolling, unbounded power. */
@@ -124,5 +125,31 @@ describe("the speed profile", () => {
   it("replays: the same line gives the same time to the bit", () => {
     const track = stadium({ straight: 600, radius: 30, spacing: 4, width: 12 });
     assert.equal(profiled(F1, track).time, profiled(F1, track).time);
+  });
+});
+
+describe("the wet road", () => {
+  it("scales the corner speed by the root of the grip on a car without air, and leaves a dry car as it was", () => {
+    assert.ok(Math.abs(cornerSpeed(TEXTBOOK, 1 / 50, 0.81) - 0.9 * cornerSpeed(TEXTBOOK, 1 / 50)) < 1e-9);
+    const line = ring(100, 126, 14);
+    const profile = createProfile(line.x.length);
+    const dry = lapTime(F1, line, profile);
+    assert.ok(lapTime(onSurface(F1, { wet: WET }), line, profile) > 1.05 * dry);
+    assert.equal(lapTime(F1, line, profile), dry);
+    assert.ok(profile.grip.every((grip) => grip === 1));
+  });
+
+  it("loses the band's grip on the dry line, smoothly to none half a band away", () => {
+    const line = ring(100, 126, 14);
+    const near = (offset) => ({ x: line.x.map((x) => x * (1 + offset / 100)), y: line.y.map((y) => y * (1 + offset / 100)) });
+    const surface = { wet: WET, line, ...BAND };
+    const grip = new Float64Array(line.x.length);
+    const at = (offset) => (fillGrip(surface, near(offset), grip), grip[0]);
+    assert.ok(Math.abs(at(0) - WET * (1 - BAND.drop)) < 1e-12);
+    assert.ok(at(0) < at(0.5) && at(0.5) < at(1) && at(1) < WET);
+    assert.equal(at(BAND.half), WET);
+    assert.equal(at(-3), WET);
+    const profile = createProfile(line.x.length);
+    assert.ok(lapTime(onSurface(F1, surface), line, profile) > lapTime(onSurface(F1, surface), near(2), profile));
   });
 });
