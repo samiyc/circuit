@@ -1,4 +1,4 @@
-import { TUM_F1, createCar, pointMassF1, powerAt, resistance } from "../car.js";
+import { TUM_F1, createCar, pointMass, powerAt, resistance } from "../car.js";
 import { PL_TYRE, lateralShare } from "./tyre.js";
 
 /**
@@ -25,19 +25,26 @@ export const CHASSIS = Object.freeze({
   pedalLag: 0.05, // s, TUM's racecar.ini, t_drive and t_brake
 });
 
+/**
+ * The Formula E's (docs/voitures.md, § 2): the height of its centre of gravity from its TUM file (h_cog), its yaw
+ * inertia the F1's scaled by m·L² (880 kg on 3.10 m against 733 kg on 3.60 m: 450 → 400 kg·m², a hypothesis), the
+ * steering and the pedals the F1's.
+ */
+export const FE_CHASSIS = Object.freeze({ ...CHASSIS, yawInertia: 400, cogHeight: 0.345 });
+
 /** The physics' own step inside a tick, s: 400 Hz keeps the tyres stable down to 5 m/s (docs/pilote.md § 2). */
 export const SUBSTEP = 0.0025;
 
 /**
- * @param {typeof TUM_F1} [file]
- * @param {typeof CHASSIS} [chassis]
+ * @param {import("../car.js").CarFile} [file]
+ * @param {Record<keyof typeof CHASSIS, number>} [chassis]
  * @param {typeof PL_TYRE} [tyre]
  */
 export function createBicycle(file = TUM_F1, chassis = CHASSIS, tyre = PL_TYRE) {
   return {
     ...chassis,
     tyre,
-    point: pointMassF1(file),
+    point: pointMass(file),
     mass: file.m,
     gravity: file.g,
     lf: file.lf,
@@ -45,9 +52,8 @@ export function createBicycle(file = TUM_F1, chassis = CHASSIS, tyre = PL_TYRE) 
     wheelbase: file.lf + file.lr,
     downFront: 0.5 * file.rhoAir * file.czAFront,
     downRear: 0.5 * file.rhoAir * file.czARear,
-    front: { muX: file.muxFront, muY: file.muyFront },
-    rear: { muX: file.muxRear, muY: file.muyRear },
-    loadSensitivity: file.dmuDfz,
+    front: { muX: file.muxFront, muY: file.muyFront, dmu: file.dmuDfzFront },
+    rear: { muX: file.muxRear, muY: file.muyRear, dmu: file.dmuDfzRear },
     nominalLoad: file.fz0,
     /** traction control and ABS (`assisted`): Sami's car only, never the drivers measured */
     assists: false,
@@ -87,18 +93,18 @@ const road = { grip: 1 };
 /**
  * An axle's grip as μ·Fz, each μ shifted by the load of one of its two tyres.
  * @param {Bicycle} car
- * @param {{ muX: number, muY: number }} axle
+ * @param {{ muX: number, muY: number, dmu: number }} axle
  * @param {number} load N, the axle
  * @param {"muX" | "muY"} direction
  */
 function grip(car, axle, load, direction) {
-  return road.grip * (axle[direction] + car.loadSensitivity * (load / 2 - car.nominalLoad)) * load;
+  return road.grip * (axle[direction] + axle.dmu * (load / 2 - car.nominalLoad)) * load;
 }
 
 /**
  * An axle's lateral force at a slip angle, within what its longitudinal force leaves of the friction ellipse.
  * @param {Bicycle} car
- * @param {{ muX: number, muY: number }} axle
+ * @param {{ muX: number, muY: number, dmu: number }} axle
  * @param {number} load N
  * @param {{ slip: number, longitudinal: number }} tyre
  */

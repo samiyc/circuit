@@ -1,5 +1,6 @@
 import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
-import { createBicycle, profileCar } from "../src/drive/bicycle.js";
+import { bicycleOf, linesDir } from "../src/cars.js";
+import { profileCar } from "../src/drive/bicycle.js";
 import { PLANNER, createPlanner, plannedControls } from "../src/drive/planner.js";
 import { TUNED, createPursuit, pathOf, pursue } from "../src/drive/pursuit.js";
 import { driveLap, startOf } from "../src/drive/run.js";
@@ -9,13 +10,14 @@ import { TRACK_NAMES, readTrack, tracksDownloaded } from "./lib/tracks.js";
 /**
  * P7, the driver by search against the tuned rule (docs/pilote.md § 9): both drive the minimum-curvature line and the
  * best one of data/lines-bicycle/ on the tracks given (all 25 by default), from the same start. `name=value`
- * arguments override PLANNER's settings, `id=` names the output, tmp/p7-planner/<id>.json. About 5 s a lap at a
- * budget of 40: through the queue.
+ * arguments override PLANNER's settings, `id=` names the output, tmp/p7-planner/<id>.json; `car=fe` drives the
+ * Formula E on its own lines (data/lines-bicycle-fe/, docs/voitures.md). About 5 s a lap at a budget of 40: through
+ * the queue.
  */
-const CAR = createBicycle();
 const LINES = ["minCurvature", "best"];
 const args = process.argv.slice(2);
 const options = Object.fromEntries(args.filter((arg) => arg.includes("=")).map((arg) => arg.split("=")));
+const CAR = bicycleOf(options.car ?? "f1");
 const names = args.filter((arg) => !arg.includes("=")).length ? args.filter((arg) => !arg.includes("=")) : TRACK_NAMES;
 const settings = { ...PLANNER, ...Object.fromEntries(Object.keys(PLANNER).filter((key) => key in options).map((key) => [key, Number(options[key])])) };
 
@@ -36,8 +38,8 @@ function race(name, track, offsets, line) {
 if (!tracksDownloaded()) throw new Error("Les pistes manquent : npm run tracks");
 const runs = names.flatMap((name) => {
   const track = readTrack(name);
-  const data = JSON.parse(readFileSync(`data/lines-bicycle/${name}.json`, "utf8"));
+  const data = JSON.parse(readFileSync(`${linesDir("data/lines-bicycle", options.car ?? "f1")}/${name}.json`, "utf8"));
   return LINES.map((line) => race(name, track, Float64Array.from(data.lines[line]), line));
 });
 mkdirSync("tmp/p7-planner", { recursive: true });
-writeFileSync(`tmp/p7-planner/${options.id ?? "base"}.json`, JSON.stringify({ settings, names, runs }, null, 1));
+writeFileSync(`tmp/p7-planner/${options.id ?? "base"}.json`, JSON.stringify({ car: options.car ?? "f1", settings, names, runs }, null, 1));

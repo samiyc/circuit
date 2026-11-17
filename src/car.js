@@ -3,6 +3,7 @@
  * downforce, the friction coefficients drop as the tyre load grows, the power is capped at the wheels. The grip each
  * profile step may use comes from here.
  * @typedef {import("./types.js").Car} Car
+ * @typedef {Record<keyof typeof TUM_F1, number>} CarFile a TUM car's figures, in the F1's terms
  */
 
 /**
@@ -29,17 +30,52 @@ export const TUM_F1 = Object.freeze({
   muyFront: 1.85,
   muxRear: 1.95,
   muyRear: 2.15,
-  dmuDfz: -5.0e-5, // 1/N, both directions, both axles
+  dmuDfzFront: -5.0e-5, // 1/N, both directions
+  dmuDfzRear: -5.0e-5,
 });
 
 /**
- * The point mass of the TUM F1: each axle's μ weighted by its static share of the load (the downforce splits about the
+ * The Formula E of the same simulation (`laptimesim/input/vehicles/FE_Berlin.ini`, read on 17/11/2026), in the F1's
+ * terms: its electric motor is its only power (200 kW after the motor's losses, through the same gearbox efficiency
+ * as the F1's engine), without a boost. Left out as for the F1: the two gears, the motor's torque cap (150 Nm, about
+ * the rear tyres' grip in first gear), the energy budget (docs/voitures.md, § 1).
+ */
+export const TUM_FE = Object.freeze({
+  lf: 1.906,
+  lr: 1.194,
+  m: 880.0, // kg, the minimum of the rules
+  fRoll: 0.02,
+  cwA: 1.15,
+  czAFront: 1.24,
+  czARear: 1.52,
+  g: 9.81,
+  rhoAir: 1.18,
+  powMax: 200e3, // W, the electric motor
+  etaGearbox: 0.96,
+  powEMotor: 0,
+  velMinEMotor: Infinity,
+  fz0: 2500.0,
+  muxFront: 1.22,
+  muyFront: 1.22,
+  muxRear: 1.42,
+  muyRear: 1.42,
+  dmuDfzFront: -2.5e-5,
+  dmuDfzRear: -2.0e-5,
+});
+
+/** An axle figure for the point mass, weighted by the static load shares (the same on both axles: as it is). */
+function weighted(front, rear, rearShare) {
+  return front === rear ? front : (1 - rearShare) * front + rearShare * rear;
+}
+
+/**
+ * The point mass of a TUM car (the F1 by default): each axle's μ weighted by its static share of the load (the downforce splits about the
  * same way, 45 % in front), the traction on the rear axle alone (it is rear-wheel drive). A hypothesis of
  * docs/modele.md, § 2, not a figure of the source.
- * @param {typeof TUM_F1} [file]
+ * @param {CarFile} [file]
  * @returns {Car}
  */
-export function pointMassF1(file = TUM_F1) {
+export function pointMass(file = TUM_F1) {
   const rearShare = file.lf / (file.lf + file.lr);
   const frontShare = 1 - rearShare;
   return createCar({
@@ -48,7 +84,7 @@ export function pointMassF1(file = TUM_F1) {
     muX: frontShare * file.muxFront + rearShare * file.muxRear,
     muY: frontShare * file.muyFront + rearShare * file.muyRear,
     driveMu: rearShare * file.muxRear,
-    loadSensitivity: file.dmuDfz,
+    loadSensitivity: weighted(file.dmuDfzFront, file.dmuDfzRear, rearShare),
     nominalLoad: file.fz0,
     downforce: 0.5 * file.rhoAir * (file.czAFront + file.czARear),
     drag: 0.5 * file.rhoAir * file.cwA,
@@ -58,6 +94,9 @@ export function pointMassF1(file = TUM_F1) {
     boostSpeed: file.velMinEMotor,
   });
 }
+
+/** The point mass of the TUM F1, the car of every measure before the Formula E. */
+export const pointMassF1 = () => pointMass(TUM_F1);
 
 /**
  * A car from its figures, with its top speed derived. Omitted terms are zero (a car without air, without rolling

@@ -1,6 +1,8 @@
 import { existsSync, readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { join } from "node:path";
+import { bicycleOf, carOf, linesDir, pointMassOf } from "../../src/cars.js";
+import { profileCar } from "../../src/drive/bicycle.js";
 import { createTrack, parseRaceline, parseTrack } from "../../src/track/track.js";
 
 /**
@@ -40,10 +42,19 @@ export function readRaceline(name) {
 
 /**
  * The lines' folder: data/lines/ for the point mass (`npm run lines`), data/lines-bicycle/ for the profile of the car
- * that slips (`npm run lines -- --bicycle`, J4), and the arguments left once the option is taken out.
+ * that slips (`npm run lines -- --bicycle`, J4); `--car=fe` another car (src/cars.js), its folders suffixed
+ * (data/lines-fe/). With the car the lines are searched for, and the arguments left once the options are taken out.
  * @param {string[]} args
  */
 export function linesOption(args) {
   const bicycle = args.includes("--bicycle");
-  return { bicycle, dir: bicycle ? "data/lines-bicycle" : "data/lines", rest: args.filter((arg) => arg !== "--bicycle") };
+  const car = args.find((arg) => arg.startsWith("--car="))?.slice("--car=".length) ?? "f1";
+  carOf(car);
+  return {
+    bicycle,
+    car,
+    dir: linesDir(bicycle ? "data/lines-bicycle" : "data/lines", car),
+    lineCar: bicycle ? profileCar(bicycleOf(car)) : pointMassOf(car),
+    rest: args.filter((arg) => arg !== "--bicycle" && !arg.startsWith("--car=")),
+  };
 }
