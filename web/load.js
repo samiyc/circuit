@@ -30,12 +30,14 @@ export async function loadTrack(name) {
 }
 
 /**
- * The lines computed by `npm run lines`, or null if they are not there.
+ * The lines computed by `npm run lines`, or null if they are not there; `folder` lines-bicycle for those searched for
+ * the car that slips (`npm run lines -- --bicycle`, the drive page).
  * @param {string} name
+ * @param {string} [folder]
  * @returns {Promise<Lines | null>}
  */
-export async function loadLines(name) {
-  const response = await fetch(`../data/lines/${name}.json`).catch(() => null);
+export async function loadLines(name, folder = "lines") {
+  const response = await fetch(`../data/${folder}/${name}.json`).catch(() => null);
   if (!response?.ok) return null;
   const data = await response.json();
   return Object.fromEntries(Object.entries(data.lines).map(([key, values]) => [key, Float64Array.from(values)]));

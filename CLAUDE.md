@@ -72,7 +72,8 @@ Its line in the roadmap: `mcts-commun/docs/feuille-de-route.md`, § 2.C. Start t
   the minimum-curvature line, 5.5 % and 7.6 % over the bicycle's profile (`profileCar`, the point mass at the front
   axle's μy). A change to the car or the driver says what it does to these figures.
 - **The drive page** (`web/drive.html`, P9): Sami's car under his keys or gamepad (`src/drive/input.js`, pure),
-  against the tuned driver and the ghost of the line's profile (`src/drive/session.js`).
+  against the tuned driver and the ghost of the line's profile (`src/drive/session.js`), on the lines searched for
+  the bicycle (`npm run lines -- --bicycle`, `data/lines-bicycle/`, 0.43 s faster; Sami, 17/11), else `data/lines/`.
 
 ## The page
 

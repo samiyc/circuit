@@ -4,6 +4,16 @@
   "intro": "Une F1 sur les circuits de TU Munich, en simulation : la ligne idéale calculée hors ligne, puis un pilote qui la suit, puis Sami aux commandes, contre lui.",
   "versions": [
     {
+      "version": "0.4.1",
+      "title": "Piloter sur les lignes de la voiture qui glisse",
+      "date": "17/11/2026",
+      "commits": [],
+      "items": [
+        "La page Piloter suit les lignes cherchées pour la voiture qui glisse (npm run lines -- --bicycle, data/lines-bicycle/) : 0,43 s plus rapides en moyenne au profil de cette voiture, plus rapides sur les 25 circuits. Sans elles, les lignes du point matériel.",
+        "P7 refait : CMA-ES contre l'escalade de la bibliothèque, à budget égal ; CMA-ES fait au moins aussi bien (docs/pilote.md § 6 bis). Le pilote réglé du 15/11 reste celui de la page."
+      ]
+    },
+    {
       "version": "0.4.0",
       "title": "Piloter : la voiture qui glisse, au clavier ou à la manette",
       "date": "15/11/2026",

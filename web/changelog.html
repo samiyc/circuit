@@ -19,6 +19,15 @@
         <h2>Les versions</h2>
 
       <article class="version">
+        <h3><span class="tag">0.4.1</span> Piloter sur les lignes de la voiture qui glisse <span class="date">17/11/2026</span></h3>
+        <ul>
+          <li>La page Piloter suit les lignes cherchées pour la voiture qui glisse (npm run lines -- --bicycle, data/lines-bicycle/) : 0,43 s plus rapides en moyenne au profil de cette voiture, plus rapides sur les 25 circuits. Sans elles, les lignes du point matériel.</li>
+          <li>P7 refait : CMA-ES contre l'escalade de la bibliothèque, à budget égal ; CMA-ES fait au moins aussi bien (docs/pilote.md § 6 bis). Le pilote réglé du 15/11 reste celui de la page.</li>
+        </ul>
+        <p class="commits"></p>
+      </article>
+
+      <article class="version">
         <h3><span class="tag">0.4.0</span> Piloter : la voiture qui glisse, au clavier ou à la manette <span class="date">15/11/2026</span></h3>
         <ul>
           <li>Une voiture qui glisse : une bicyclette dynamique aux pneus de F1 (Perantoni et Limebeer, 2014), à 100 Hz. Passé le pic d'adhérence, elle part en tête-à-queue.</li>

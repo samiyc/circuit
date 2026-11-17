@@ -213,9 +213,9 @@ pure (`src/drive/input.js`), et la course par `src/drive/session.js`, tous deux 
   le pilote réglé.
 - **P6**, l'escalade sur les entrées pas à pas, après.
 
-**Question pour Sami** : faut-il que la page Piloter prenne les lignes de la bicyclette (`data/lines-bicycle/`, § 6
-bis) ? Je le recommande : elles sont plus rapides sur les 25 pistes, de 0,43 s en moyenne. La page des lignes resterait
-celle du point matériel, qui est le modèle des J1 à J3.
+**Décidé avec Sami le 17/11** : la page Piloter prend les lignes de la bicyclette (`data/lines-bicycle/`, § 6 bis),
+plus rapides sur les 25 pistes, et à défaut celles du point matériel. La page des lignes garde celles du point
+matériel, le modèle des J1 à J3.
 
 ## Sources
 

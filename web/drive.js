@@ -59,7 +59,7 @@ async function selectTrack(name) {
   try {
     const { track, text } = await loadTrack(name);
     state.track = track;
-    state.offsets = (await loadLines(name)) ?? (await computeLines(text, "references"));
+    state.offsets = (await loadLines(name, "lines-bicycle")) ?? (await loadLines(name)) ?? (await computeLines(text, "references"));
     const chosen = els.line.value;
     els.line.replaceChildren(...DRIVEN.filter((key) => state.offsets[key]).map((key) => new Option(LINE_NAMES[key], key)));
     if (state.offsets[chosen]) els.line.value = chosen;
