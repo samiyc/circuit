@@ -4,6 +4,16 @@
   "intro": "Une F1 sur les circuits de TU Munich, en simulation : la ligne idéale calculée hors ligne, puis un pilote qui la suit, puis Sami aux commandes, contre lui.",
   "versions": [
     {
+      "version": "0.6.0",
+      "title": "Piloter : le pilote par recherche comme adversaire",
+      "date": "17/11/2026",
+      "commits": [],
+      "items": [
+        "L'adversaire au choix : le pilote par recherche, par défaut (la règle corrigée par une recherche sur les 2,5 s à venir, environ 2 s plus rapide au tour), ou le pilote réglé.",
+        "Le pilote par recherche roule dans un worker, en avance sur la page : l'image ne saccade pas."
+      ]
+    },
+    {
       "version": "0.5.0",
       "title": "Piloter : la vue de derrière, les panneaux de freinage, les gâchettes dosées",
       "date": "17/11/2026",

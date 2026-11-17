@@ -223,8 +223,7 @@ pure (`src/drive/input.js`), et la course par `src/drive/session.js`, tous deux 
 ## 8. La suite
 
 - **Le retour de Sami** sur la conduite avec les aides, les vues et les gâchettes (0.4.2 et 0.5.0).
-- **Le pilote par recherche sur la page** (§ 9) : il coûte 21 % d'un cœur, en pics de 50 ms toutes les 0,25 s. Il
-  lui faut un worker pour ne pas faire saccader l'image.
+- **Le pilote par recherche sur la page** (§ 9) : fait le 17/11, voir la fin du § 9.
 - **P6**, l'escalade sur les entrées pas à pas, sans règle dessous.
 
 ## 9. Le pilote par recherche (P7, 17/11)
@@ -262,6 +261,14 @@ Quatre tours de mesure, 23 variantes :
   virage à la limite, ce que la bicyclette ne fait pas tout à fait.
 - **Le coût** : 400 plans par seconde de course, chacun 2,5 s simulées. Il faut environ 13 s de calcul pour une minute
   de course, soit 21 % d'un cœur.
+
+**Sur la page Piloter** (Sami, 17/11), le pilote par recherche est l'adversaire par défaut ; le pilote réglé reste au
+choix. Sa recherche prend environ 50 ms toutes les 0,25 s, trop pour le fil de la page : un worker
+(`web/planner-worker.js`) conduit sa voiture en avance et passe ses états tick par tick (`src/drive/feed.js`). Il
+le peut parce que les voitures ne se touchent pas : la course du pilote ne dépend pas de celle de Sami. La page garde
+3 s d'avance et demande 1 s à la fois. Le pilote attend si le worker est en retard, son chrono arrêté. Vérifié dans
+Chrome sans fenêtre à Monza : 6 à 12 ms au plus entre deux images, et le tour du pilote fait 1:26,50, comme sous Node
+avec la même graine (la règle réglée : 1:26,98 du même départ).
 
 **Décidé avec Sami le 17/11** : la page Piloter prend les lignes de la bicyclette (`data/lines-bicycle/`, § 6 bis),
 plus rapides sur les 25 pistes, et à défaut celles du point matériel. La page des lignes garde celles du point

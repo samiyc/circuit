@@ -14,12 +14,13 @@
     <header class="masthead">
       <p class="links"><a href="index.html">← les lignes</a> · <a href="changelog.html" id="version">Journal des versions</a></p>
       <h1>Piloter</h1>
-      <p>La F1 qui glisse, au clavier ou à la manette, contre le fantôme de la ligne et contre le pilote de la poursuite pure.</p>
+      <p>La F1 qui glisse, au clavier ou à la manette, contre le fantôme de la ligne et contre un pilote : par recherche, ou la poursuite pure réglée.</p>
     </header>
     <main>
       <section class="controls">
         <label>Circuit<select id="track"></select></label>
         <label>Ligne suivie<select id="line"></select></label>
+        <label>Adversaire<select id="opponent"><option value="search">le pilote par recherche</option><option value="rule">le pilote réglé</option></select></label>
         <label>Vue (V)<select id="view"><option value="chase">derrière la voiture</option><option value="near">de dessus, proche</option><option value="far">de dessus, loin</option></select></label>
         <label>Manette<select id="pad"><option value="sami">A gaz, RB ou RT frein</option><option value="triggers">RT gaz dosé, LT frein dosé</option></select></label>
         <button type="button" id="restart">Recommencer (R)</button>
@@ -34,7 +35,7 @@
         <strong>Commandes.</strong> Clavier : flèche haut pour accélérer, Ctrl gauche (ou flèche bas) pour freiner, flèches gauche et droite pour tourner.
         Manette : A pour accélérer, RB pour freiner, la gâchette RT pour freiner en dosant, le stick gauche pour tourner ; ou, au choix, RT pour accélérer en dosant et LT pour freiner en dosant, comme dans les jeux de course.
         Les panneaux blancs au bord de la piste annoncent le freinage : trois bandes à 150 m, deux à 100 m, une à 50 m.
-        Ta voiture est rouge ; la claire est le pilote de la poursuite pure ; la blanche, transparente, est le fantôme du profil de vitesse de la ligne, le temps que la voiture pourrait faire.
+        Ta voiture est rouge ; la claire est ton adversaire : le pilote par recherche (la règle corrigée par une recherche sur les 2,5 s à venir, 2 s plus rapide au tour), ou le pilote réglé (la poursuite pure seule) ; la blanche, transparente, est le fantôme du profil de vitesse de la ligne, le temps que la voiture pourrait faire.
         L'écart se lit au même point du tour : positif, tu es derrière.
         Les aides (T pour les couper) : l'antipatinage et l'ABS ne laissent l'accélérateur et le frein prendre que l'adhérence que le virage n'utilise pas ; sans elles, plein gaz en sortie de virage, l'arrière décroche.
       </p>

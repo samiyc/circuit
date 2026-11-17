@@ -5,7 +5,8 @@ import { CHASSIS, createBicycle, createCarState, profileCar, stepCar } from "../
 import { TUNED, createPursuit, gripLeft, nearestPoint, pathOf, pedalFor, pursue } from "../src/drive/pursuit.js";
 import { LATERAL_LIMIT, controlsOf, keyboardInput, lockAt, mergeInputs, padInput } from "../src/drive/input.js";
 import { driveLap, driveLine, pastEdge, sideOf, startOf } from "../src/drive/run.js";
-import { createSession, lapGap, tickSession } from "../src/drive/session.js";
+import { FEED_FIELDS, createFeed, feedTicks } from "../src/drive/feed.js";
+import { createSession, fedTicks, feedSession, lapGap, tickSession } from "../src/drive/session.js";
 import { PLANNER, createPlanner, plannedControls, scorePlan } from "../src/drive/planner.js";
 import { PL_TYRE, lateralShare, peakSlip } from "../src/drive/tyre.js";
 import { lineBounds } from "../src/line/line.js";
@@ -196,6 +197,27 @@ describe("a drive on the page", () => {
     assert.equal(on.playerCar.assists, true);
     assert.equal(on.car.assists, false);
     assert.equal(createSession({ track: square, path, car: CAR, assists: false }).playerCar.assists, false);
+  });
+
+  it("drives the driver by search on the worker's states, chunk by chunk as at once, waiting when they run dry", () => {
+    const where = { track: square, path, car: CAR };
+    const settings = { ...PLANNER, budget: 12 };
+    const [split, whole] = [createFeed(where, { seed: 2, settings }), createFeed(where, { seed: 2, settings })];
+    const all = feedTicks(whole, 2400);
+    assert.deepEqual([...feedTicks(split, 100), ...feedTicks(split, 2300)], [...all]);
+    const hands = { throttle: 0, brake: 0, steer: 0, analog: false };
+    const [ahead, starved] = [createSession({ ...where, fed: true }), createSession({ ...where, fed: true })];
+    feedSession(ahead, all);
+    for (let k = 0; k < 2400; k += 1) tickSession(ahead, hands);
+    for (let k = 0; k < 24; k += 1) {
+      feedSession(starved, all.subarray(k * 100 * FEED_FIELDS, (k + 1) * 100 * FEED_FIELDS));
+      for (let t = 0; t < 130; t += 1) tickSession(starved, hands);
+      assert.equal(fedTicks(starved), 0);
+    }
+    assert.equal(starved.robot.state.x, all.at(-FEED_FIELDS));
+    assert.ok(ahead.robot.laps.length === 1 && ahead.robot.laps[0].time < 1.1 * lap.time, `${ahead.robot.laps[0]?.time} s against ${lap.time} s`);
+    assert.deepEqual(starved.robot.laps, ahead.robot.laps);
+    assert.ok(Math.abs(starved.robot.clock - 24) < 1e-9 && Math.abs(starved.time - 31.2) < 1e-9);
   });
 });
 

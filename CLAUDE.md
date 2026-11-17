@@ -74,7 +74,8 @@ Its line in the roadmap: `mcts-commun/docs/feuille-de-route.md`, § 2.C. Start t
   (`src/drive/planner.js`, a climb on a 2.5 s plan over `TUNED`, `scripts/p7-planner.js` through the queue): 50/50
   laps at 5.4 %, 2.06 ± 0.23 s a lap better than `TUNED` (docs/pilote.md § 9).
 - **The drive page** (`web/drive.html`, P9): Sami's car under his keys or gamepad (`src/drive/input.js`, pure),
-  against the tuned driver and the ghost of the line's profile (`src/drive/session.js`), on the lines searched for
+  against the driver by search (its car driven ahead in a worker, `web/planner-worker.js`, `src/drive/feed.js`) or
+  the tuned one, and the ghost of the line's profile (`src/drive/session.js`), on the lines searched for
   the bicycle (`npm run lines -- --bicycle`, `data/lines-bicycle/`, 0.43 s faster; Sami, 17/11), else `data/lines/`.
   His car has the assists (traction control and ABS, T); views from behind (`src/view/chase.js`) or above (V), the
   braking boards (`src/view/boards.js`), two gamepad layouts.
