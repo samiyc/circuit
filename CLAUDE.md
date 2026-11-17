@@ -85,6 +85,8 @@ Its line in the roadmap: `mcts-commun/docs/feuille-de-route.md`, § 2.C. Start t
   the dry, Pirelli's rule for the intermediates) and, a hypothesis, the dry line's band 15 % more slippery.
   `node scripts/p8.js wet|band|band30` searches the rain line into `data/lines-wet/` (through the queue);
   `scripts/p8-summary.js` reads it: 1.30 s gained on the wet road, 6.52 s with the band, the line off it at the apex.
+  The car that slips gets the road's grip under it each tick (`roadGrip`); both pages have a weather menu, the drive
+  page on the bicycle's rain lines (`--bicycle`, `data/lines-wet-bicycle/`).
 
 ## The page
 

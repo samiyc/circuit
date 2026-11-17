@@ -81,10 +81,35 @@ perte de la bande subie.
   de la bande, une hypothèse : à 1,5 m, s'écarter de 1 m suffit à éviter 70 % de la perte. Une bande plus large
   pousserait la ligne plus loin, au prix de virages plus serrés.
 
+**La bande de 3 m** (`wide`, 15 %, mesurée le 17/11, demandée par Sami) : la ligne de pluie gagne 4,98 s
+[4,24 ; 5,72], 25/25, moins qu'avec la bande de 1,5 m.
+
+| Phase | Bande 1,5 m | Bande 3 m |
+|---|--:|--:|
+| 60 m avant | 0,26 m · 47 % | 0,52 m · 67 % |
+| entrée | 0,62 m · 46 % | 0,71 m · 66 % |
+| milieu | 1,05 m · 32 % | 1,17 m · 55 % |
+| sortie | 0,41 m · 38 % | 0,40 m · 55 % |
+| 60 m après | 0,37 m · 45 % | 0,47 m · 59 % |
+
+Avec une bande deux fois plus large, la ligne ne s'écarte presque pas plus (quelques dizaines de centimètres avant le
+virage et à l'entrée) : elle subit davantage la bande au lieu de la fuir. S'en écarter de 3 m coûterait trop de
+rayon. **L'entrée large des écoles ne vient donc pas de la bande seule** dans notre modèle. D'autres causes que nous
+ne modélisons pas peuvent la donner : l'eau qui stagne à la corde, les vibreurs et les peintures glissants, le dévers.
+
 **Les limites.** Le point matériel n'a pas de dérapage. La bande suit la meilleure ligne sèche de *notre* modèle, pas
 la gomme d'une vraie course. La perte et la largeur de la bande sont des hypothèses, la réponse en dépend.
 
 ## 4. Sur la page
+
+**La page Piloter** (0.8.0) a le même menu Météo. La voiture de Sami, le pilote (dans son worker aussi) et le
+fantôme roulent sur la même route : l'état de la voiture porte l'adhérence sous elle (`roadGrip`,
+`src/drive/run.js`), mise à chaque tic depuis la surface ; l'écart à la ligne sèche se mesure en travers de la piste.
+Le panneau donne l'adhérence sous la voiture. La ligne suivie est la ligne de pluie de la bicyclette
+(`node scripts/p8.js wet|band --bicycle`, `data/lines-wet-bicycle/`), qui gagne comme celle du point matériel :
+1,22 s [0,91 ; 1,54] sur la route mouillée, 6,59 s [5,82 ; 7,35] avec la bande, 25/25. À Monza, avec la bande, la
+suivre au lieu de la ligne sèche fait gagner 5,0 s à la règle réglée (95,07 s) et 3,8 s au pilote par recherche
+(95,11 s), pour un profil de 89,56 s.
 
 La page des lignes a un menu Météo : sec, pluie, ou pluie avec la trajectoire sèche glissante (15 %). Sous la pluie,
 toutes les lignes roulent sur la route mouillée, et la ligne de pluie (P8) s'ajoute si `scripts/p8.js` l'a cherchée.
